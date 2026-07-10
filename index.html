@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>太鼓達人曲目篩選器 — taiko.wiki</title>
+<style>
+  :root {
+    --bg: #141414;
+    --panel: #1e1e1e;
+    --row-odd: #232323;
+    --row-even: #1b1b1b;
+    --text: #e6e6e6;
+    --muted: #bbbbbb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans CJK TC",
+                 "Segoe UI", sans-serif;
+  }
+  header {
+    padding: 16px 20px 4px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 20px;
+  }
+  header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .wrap { padding: 8px 20px 24px; }
+  fieldset {
+    border: none;
+    margin: 10px 0;
+    padding: 0;
+  }
+  legend {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 6px 0;
+    color: #fff;
+  }
+  .toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .toggle {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #cfcfcf;
+    background: #2b2b2b;
+    cursor: pointer;
+    transition: transform .05s ease;
+    min-width: 84px;
+  }
+  .toggle:hover { filter: brightness(1.15); }
+  .toggle:active { transform: scale(.96); }
+  .toggle.on { color: #fff; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    margin: 12px 0;
+  }
+  .controls label { color: var(--muted); font-size: 14px; }
+  .star-label { color: #ffd54a; font-weight: bold; }
+  .val { color: #fff; width: 34px; display: inline-block; text-align: center; }
+  input[type="range"] { width: 150px; vertical-align: middle; }
+  select {
+    background: var(--panel); color: var(--text);
+    border: 1px solid #444; border-radius: 4px; padding: 4px 8px;
+  }
+  button.action {
+    border: none; border-radius: 6px; padding: 8px 18px;
+    font-weight: bold; color: #fff; cursor: pointer;
+  }
+  .btn-search { background: #e15b5b; }
+  .btn-clear  { background: #444; }
+  .btn-export { background: #3a5f8a; }
+  .btn-open   { background: #2f6f63; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+  thead th {
+    background: #333;
+    color: #fff;
+    text-align: left;
+    padding: 8px 10px;
+    position: sticky;
+    top: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  thead th:hover { background: #3d3d3d; }
+  tbody td { padding: 7px 10px; }
+  tbody tr:nth-child(odd)  { background: var(--row-odd); }
+  tbody tr:nth-child(even) { background: var(--row-even); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: #3a5f8a; }
+  .center { text-align: center; }
+  .table-scroll { max-height: 55vh; overflow-y: auto; border: 1px solid #2a2a2a; border-radius: 6px; }
+
+  .statusbar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin-top: 10px;
+  }
+  #status { color: #9fe0a0; font-size: 14px; flex: 1 1 300px; }
+  #status.err { color: #ff8a80; }
+  .spacer { flex: 1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>太鼓達人曲目篩選器</h1>
+  <p>依類型與難易度篩選，依 ★ 星等排序，雙擊列可開啟 taiko.wiki 曲目頁。</p>
+</header>
+
+<div class="wrap">
+  <fieldset>
+    <legend>類型</legend>
+    <div class="toggles" id="genreToggles"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>難易度</legend>
+    <div class="toggles" id="diffToggles"></div>
+  </fieldset>
+
+  <div class="controls">
+    <span class="star-label">★ 星等</span>
+    <label>下限</label>
+    <input type="range" id="minRange" min="1" max="10" value="1">
+    <span class="val" id="minVal">★1</span>
+    <label>上限</label>
+    <input type="range" id="maxRange" min="1" max="10" value="10">
+    <span class="val" id="maxVal">★10</span>
+
+    <label>連結語系</label>
+    <select id="langSel">
+      <option value="zh-tw">zh-tw</option>
+      <option value="zh-cn">zh-cn</option>
+      <option value="ja">ja</option>
+      <option value="en">en</option>
+      <option value="ko">ko</option>
+    </select>
+
+    <button class="action btn-search" id="btnSearch">🔍 篩選</button>
+    <button class="action btn-clear" id="btnClear">清除選取</button>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th data-col="star" class="center">★</th>
+          <th data-col="diff" class="center">難度</th>
+          <th data-col="genre" class="center">類型</th>
+          <th data-col="title">曲名（雙擊開啟 taiko.wiki）</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="statusbar">
+    <span id="status">載入資料中…</span>
+    <span class="spacer"></span>
+    <button class="action btn-open"   id="btnOpen">開啟選取曲目</button>
+    <button class="action btn-export" data-fmt="csv">匯出 CSV</button>
+    <button class="action btn-export" data-fmt="json">匯出 JSON</button>
+    <button class="action btn-export" data-fmt="md">匯出 Markdown</button>
+  </div>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ 對應表 */
+const GENRE_LABEL = {
+  pops: "流行音樂", anime: "動畫", kids: "兒童", vocaloid: "VOCALOID™",
+  game: "遊戲音樂", namco: "南科原創", variety: "綜藝", classic: "古典",
+};
+const GENRE_COLORS = {
+  pops: "#3bb8b0", anime: "#e58ec4", kids: "#e2b23c", vocaloid: "#b7bce0",
+  game: "#9b7fdc", namco: "#e15b5b", variety: "#7cbf5a", classic: "#c9a227",
+};
+const DIFF_LABEL = {
+  easy: "簡單", normal: "普通", hard: "困難", oni: "魔鬼(表)", ura: "魔鬼(裏)",
+};
+const DIFF_COLORS = {
+  easy: "#e8462b", normal: "#5f8f3a", hard: "#2f6f63", oni: "#d61e8c", ura: "#7a3ff0",
+};
+const DIFF_ORDER = { easy: 0, normal: 1, hard: 2, oni: 3, ura: 4 };
+
+const SONG_PAGE = "https://taiko.wiki/song/";
+/* 資料來源：優先讀同資料夾快照，失敗再退回 GitHub 鏡像 */
+const LOCAL_DB = "database.json";
+const DB_MIRROR = "https://raw.githubusercontent.com/taikowiki/taiko-song-database/master/database.json";
+
+/* ------------------------------------------------------------------ 狀態 */
+let SONGS = null;
+let ROWS = [];
+const genreSel = {};   // code -> bool
+const diffSel = {};    // code -> bool
+
+/* ------------------------------------------------------------------ 建立切換鈕 */
+function buildToggles(containerId, labelMap, colorMap, selState) {
+  const box = document.getElementById(containerId);
+  for (const [code, label] of Object.entries(labelMap)) {
+    selState[code] = false;
+    const btn = document.createElement("button");
+    btn.className = "toggle";
+    btn.textContent = label;
+    btn.dataset.code = code;
+    btn.addEventListener("click", () => {
+      selState[code] = !selState[code];
+      paintToggle(btn, selState[code], colorMap[code]);
+    });
+    paintToggle(btn, false, colorMap[code]);
+    box.appendChild(btn);
+  }
+}
+function paintToggle(btn, on, color) {
+  if (on) {
+    btn.classList.add("on");
+    btn.style.background = color;
+  } else {
+    btn.classList.remove("on");
+    btn.style.background = "#2b2b2b";
+  }
+}
+
+/* ------------------------------------------------------------------ 篩選核心 */
+function buildRows(songs, genres, diffs, minLevel, maxLevel, lang, includeDeleted) {
+  const rows = [];
+  const genreSet = new Set(genres);
+  for (const s of songs) {
+    if (!includeDeleted && s.isDeleted) continue;
+    const songGenres = s.genre || [];
+    if (genreSet.size && !songGenres.some(g => genreSet.has(g))) continue;
+
+    const courses = s.courses || {};
+    for (const diff of diffs) {
+      const course = courses[diff];
+      if (!course) continue;
+      const level = course.level;
+      if (level === null || level === undefined) continue;
+      if (minLevel !== null && level < minLevel) continue;
+      if (maxLevel !== null && level > maxLevel) continue;
+
+      const songNo = s.songNo;
+      let url = SONG_PAGE + songNo;
+      if (lang) url += `?lang=${lang}`;
+      const shown = songGenres.filter(g => !genreSet.size || genreSet.has(g));
+      rows.push({
+        songNo,
+        title: s.title || s.titleEn || s.romaji || "",
+        romaji: s.romaji || "",
+        genres: shown.length ? shown : songGenres,
+        difficulty: diff,
+        level,
+        url,
+      });
+    }
+  }
+  rows.sort((a, b) =>
+    (a.level - b.level) ||
+    ((DIFF_ORDER[a.difficulty] ?? 99) - (DIFF_ORDER[b.difficulty] ?? 99)) ||
+    a.title.localeCompare(b.title));
+  return rows;
+}
+
+/* ------------------------------------------------------------------ 顯示表格 */
+function populate() {
+  const tb = document.getElementById("tbody");
+  tb.innerHTML = "";
+  const frag = document.createDocumentFragment();
+  ROWS.forEach((r, i) => {
+    const tr = document.createElement("tr");
+    tr.dataset.idx = i;
+    const gnr = r.genres.map(g => GENRE_LABEL[g] || g).join("/");
+    tr.innerHTML =
+      `<td class="center">★${r.level}</td>` +
+      `<td class="center">${DIFF_LABEL[r.difficulty] || r.difficulty}</td>` +
+      `<td class="center">${gnr}</td>` +
+      `<td>${escapeHtml(r.title)}</td>`;
+    tr.addEventListener("click", () => selectRow(tr));
+    tr.addEventListener("dblclick", () => window.open(r.url, "_blank"));
+    frag.appendChild(tr);
+  });
+  tb.appendChild(frag);
+  setStatus(`符合條件共 ${ROWS.length} 筆。雙擊任一列可開啟 taiko.wiki。`);
+}
+let selectedTr = null;
+function selectRow(tr) {
+  if (selectedTr) selectedTr.style.outline = "";
+  selectedTr = tr;
+  tr.style.outline = "2px solid #6ea8ff";
+}
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ------------------------------------------------------------------ 排序（點表頭） */
+function sortBy(col) {
+  const keyers = {
+    star:  (r) => [r.level, DIFF_ORDER[r.difficulty]],
+    diff:  (r) => [DIFF_ORDER[r.difficulty]],
+    genre: (r) => [r.genres[0] || ""],
+    title: (r) => [r.title],
+  };
+  const k = keyers[col];
+  ROWS.sort((a, b) => {
+    const ka = k(a), kb = k(b);
+    for (let i = 0; i < ka.length; i++) {
+      if (ka[i] < kb[i]) return -1;
+      if (ka[i] > kb[i]) return 1;
+    }
+    return 0;
+  });
+  populate();
+}
+
+/* ------------------------------------------------------------------ 事件 */
+function search() {
+  if (!SONGS) { alert("資料尚未載入完成。"); return; }
+  const genres = Object.keys(genreSel).filter(c => genreSel[c]);
+  let diffs = Object.keys(diffSel).filter(c => diffSel[c]);
+  if (!diffs.length) diffs = Object.keys(DIFF_ORDER);   // 未選 = 全部難度
+  const lo = +document.getElementById("minRange").value;
+  const hi = +document.getElementById("maxRange").value;
+  const lang = document.getElementById("langSel").value;
+  ROWS = buildRows(SONGS, genres, diffs, lo, hi, lang, false);
+  populate();
+}
+function clearSelection() {
+  for (const k in genreSel) genreSel[k] = false;
+  for (const k in diffSel) diffSel[k] = false;
+  document.querySelectorAll(".toggle").forEach(btn => {
+    const code = btn.dataset.code;
+    const color = GENRE_COLORS[code] || DIFF_COLORS[code];
+    paintToggle(btn, false, color);
+  });
+  document.getElementById("minRange").value = 1;
+  document.getElementById("maxRange").value = 10;
+  syncStars();
+}
+function openSelected() {
+  if (!selectedTr) { alert("請先點選一列。"); return; }
+  window.open(ROWS[+selectedTr.dataset.idx].url, "_blank");
+}
+
+/* ------------------------------------------------------------------ 匯出 */
+function exportData(fmt) {
+  if (!ROWS.length) { alert("請先篩選出結果再匯出。"); return; }
+  let text, mime, name;
+  if (fmt === "csv") {
+    const head = ["songNo","level","difficulty","difficulty_zh","genres","title","romaji","url"];
+    const lines = [head.join(",")];
+    for (const r of ROWS) {
+      lines.push([
+        r.songNo, r.level, r.difficulty,
+        DIFF_LABEL[r.difficulty] || r.difficulty,
+        r.genres.join("/"), r.title, r.romaji, r.url
+      ].map(csvCell).join(","));
+    }
+    text = "\ufeff" + lines.join("\r\n");
+    mime = "text/csv"; name = "taiko_result.csv";
+  } else if (fmt === "json") {
+    text = JSON.stringify(ROWS, null, 2);
+    mime = "application/json"; name = "taiko_result.json";
+  } else {
+    const lines = ["| ★ | 難度 | 類型 | 曲名 | 連結 |",
+                   "|---|------|------|------|------|"];
+    for (const r of ROWS) {
+      const gnr = r.genres.map(g => GENRE_LABEL[g] || g).join("/");
+      const title = r.title.replace(/\|/g, "\\|");
+      lines.push(`| ★${r.level} | ${DIFF_LABEL[r.difficulty] || r.difficulty} | ${gnr} | ${title} | [開啟](${r.url}) |`);
+    }
+    lines.push(`\n_共 ${ROWS.length} 筆_`);
+    text = lines.join("\n");
+    mime = "text/markdown"; name = "taiko_result.md";
+  }
+  const blob = new Blob([text], { type: mime + ";charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  setStatus(`已匯出 ${ROWS.length} 筆：${name}`);
+}
+function csvCell(v) {
+  const s = String(v ?? "");
+  return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+/* ------------------------------------------------------------------ ★ 滑桿 */
+function syncStars() {
+  const minR = document.getElementById("minRange");
+  const maxR = document.getElementById("maxRange");
+  let lo = +minR.value, hi = +maxR.value;
+  if (lo > hi) { maxR.value = lo; hi = lo; }
+  document.getElementById("minVal").textContent = "★" + lo;
+  document.getElementById("maxVal").textContent = "★" + hi;
+}
+
+/* ------------------------------------------------------------------ 載入資料 */
+async function loadSongs() {
+  for (const [label, url] of [["本地 database.json", LOCAL_DB],
+                              ["GitHub 鏡像", DB_MIRROR]]) {
+    try {
+      const resp = await fetch(url, { cache: "no-cache" });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      let data = await resp.json();
+      if (data && !Array.isArray(data) && data.data) data = data.data;
+      SONGS = data;
+      setStatus(`已載入 ${data.length} 首曲目（${label}）。請選擇條件後按「篩選」。`);
+      return;
+    } catch (e) {
+      console.warn(`${label} 失敗：`, e);
+    }
+  }
+  setStatus("資料載入失敗，請確認 database.json 是否與網頁同資料夾。", true);
+}
+function setStatus(text, err = false) {
+  const el = document.getElementById("status");
+  el.textContent = text;
+  el.classList.toggle("err", err);
+}
+
+/* ------------------------------------------------------------------ 初始化 */
+function init() {
+  buildToggles("genreToggles", GENRE_LABEL, GENRE_COLORS, genreSel);
+  buildToggles("diffToggles", DIFF_LABEL, DIFF_COLORS, diffSel);
+
+  document.getElementById("minRange").addEventListener("input", syncStars);
+  document.getElementById("maxRange").addEventListener("input", syncStars);
+  document.getElementById("btnSearch").addEventListener("click", search);
+  document.getElementById("btnClear").addEventListener("click", clearSelection);
+  document.getElementById("btnOpen").addEventListener("click", openSelected);
+  document.querySelectorAll(".btn-export").forEach(b =>
+    b.addEventListener("click", () => exportData(b.dataset.fmt)));
+  document.querySelectorAll("thead th").forEach(th =>
+    th.addEventListener("click", () => sortBy(th.dataset.col)));
+
+  syncStars();
+  loadSongs();
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
