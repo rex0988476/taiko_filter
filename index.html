@@ -81,11 +81,11 @@
     background: var(--panel); color: var(--text);
     border: 1px solid #444; border-radius: 4px; padding: 4px 8px;
   }
-  a.donder {
+  a.act {
     text-decoration: none; margin-left: 8px; font-size: 13px; opacity: .85;
-    white-space: nowrap;
+    white-space: nowrap; cursor: pointer;
   }
-  a.donder:hover { opacity: 1; }
+  a.act:hover { opacity: 1; }
   input[type="text"].search {
     background: var(--panel); color: var(--text);
     border: 1px solid #444; border-radius: 4px; padding: 5px 10px;
@@ -293,8 +293,8 @@ const DIFF_COLORS = {
 };
 const DIFF_ORDER = { easy: 0, normal: 1, hard: 2, oni: 3, ura: 4 };
 
-/* 難度 -> donderhiroba 的 level 參數（官方 song_no 相同） */
-const DONDER_LEVEL = { easy: 1, normal: 2, hard: 3, oni: 4, ura: 5 };
+/* donderhiroba 選曲（搜尋）頁：複製曲名後自行貼上搜尋加最愛 */
+const DONDER_SELECT_URL = "https://donderhiroba.jp/select_song.php";
 
 /* 標記（與本地 GUI 共用 marks.json；label/color 供顯示） */
 const MARK_LABEL = { fc: "FC", perfect: "全良", near: "快全良" };
@@ -402,8 +402,14 @@ function populate() {
       `<td class="center" data-label="★">★${r.level}</td>` +
       `<td class="center" data-label="難度">${DIFF_LABEL[r.difficulty] || r.difficulty}</td>` +
       `<td class="center" data-label="類型">${gnr}</td>` +
-      `<td class="title-cell" data-label="曲名">${escapeHtml(r.title)}${donderLink(r)}</td>` +
+      `<td class="title-cell" data-label="曲名">${escapeHtml(r.title)}${titleActions()}</td>` +
       markCell(r);
+    const copyA = tr.querySelector("a.copy");
+    if (copyA) copyA.addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation(); copyText(r.title);
+    });
+    const donderA = tr.querySelector("a.donder");
+    if (donderA) donderA.addEventListener("click", (e) => e.stopPropagation());
     tr.addEventListener("click", () => selectRow(tr));
     tr.addEventListener("dblclick", () => window.open(r.url, "_blank"));
     frag.appendChild(tr);
@@ -438,14 +444,26 @@ function markCell(r) {
   if (!txt) return `<td class="center" data-label="標記"></td>`;
   return `<td class="center" data-label="標記">${escapeHtml(txt)}</td>`;
 }
-/* donderhiroba 連結（僅數字 songNo；點了可到該曲頁面按★加最愛） */
-function donderLink(r) {
-  if (!/^\d+$/.test(String(r.songNo))) return "";
-  const lv = DONDER_LEVEL[r.difficulty];
-  if (!lv) return "";
-  const url = `https://donderhiroba.jp/score_detail.php?song_no=${r.songNo}&level=${lv}`;
-  return ` <a class="donder" href="${url}" target="_blank" rel="noopener"` +
-         ` title="在 donderhiroba 開啟（可加最愛）" onclick="event.stopPropagation()">🔗</a>`;
+/* 曲名後的快捷動作：📋 複製曲名、🔗 開啟 donderhiroba 選曲頁 */
+function titleActions() {
+  return ` <a class="act copy" href="#" title="複製曲名">📋</a>` +
+         ` <a class="act donder" href="${DONDER_SELECT_URL}" target="_blank"` +
+         ` rel="noopener" title="開啟 donderhiroba 選曲頁">🔗</a>`;
+}
+function copyText(t) {
+  const done = () => setStatus(`已複製曲名：${t}`);
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(t).then(done, () => legacyCopy(t, done));
+  } else {
+    legacyCopy(t, done);
+  }
+}
+function legacyCopy(t, done) {
+  const ta = document.createElement("textarea");
+  ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) { /* ignore */ }
+  document.body.removeChild(ta);
 }
 
 /* ------------------------------------------------------------------ 排序（點表頭） */

@@ -58,8 +58,8 @@ PLAYLISTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 MARK_LABEL = {"fc": "FC", "perfect": "全良", "near": "快全良"}
 MARK_FG = {"fc": "#7ec4ff", "perfect": "#ffd54a", "near": "#ffb066"}
 
-# 難度 -> donderhiroba 的 level 參數（與官方 song_no 搭配開啟曲目頁）
-DONDER_LEVEL = {"easy": 1, "normal": 2, "hard": 3, "oni": 4, "ura": 5}
+# donderhiroba 選曲（搜尋）頁，方便貼上已複製的曲名自行搜尋加最愛
+DONDER_SELECT_URL = "https://donderhiroba.jp/select_song.php"
 
 # 依作業系統挑選可正確顯示中日文的字型（找不到時 Tk 會自動退回預設）
 if sys.platform.startswith("win"):
@@ -336,8 +336,11 @@ class TaikoGUI(tk.Tk):
         tk.Button(bframe, text="開啟選取曲目", command=self._open_selected,
                   bg="#2f6f63", fg="white", relief="flat", padx=10, pady=3,
                   cursor="hand2").pack(side="right", padx=4)
-        tk.Button(bframe, text="🔗 donderhiroba", command=self._open_donder,
+        tk.Button(bframe, text="🔗 donderhiroba 選曲頁", command=self._open_donder,
                   bg="#b06a2f", fg="white", relief="flat", padx=10, pady=3,
+                  cursor="hand2").pack(side="right", padx=4)
+        tk.Button(bframe, text="📋 複製曲名", command=self._copy_title,
+                  bg="#5a6a8a", fg="white", relief="flat", padx=10, pady=3,
                   cursor="hand2").pack(side="right", padx=4)
 
         self._refresh_playlist_combos()
@@ -694,22 +697,18 @@ class TaikoGUI(tk.Tk):
         webbrowser.open(r["url"])
 
     def _open_donder(self, event=None):
+        webbrowser.open(DONDER_SELECT_URL)
+
+    def _copy_title(self, event=None):
         sel = self.tree.selection()
         if not sel:
-            messagebox.showinfo("未選取", "請先點選一列。")
+            messagebox.showinfo("未選取", "請先點選一列，再複製曲名。")
             return
         r = self.rows[int(sel[0])]
-        song_no = str(r["songNo"])
-        if not song_no.isdigit():
-            messagebox.showinfo("無法對應",
-                                "這首曲目沒有 donderhiroba 對應編號（非數字 songNo）。")
-            return
-        lv = DONDER_LEVEL.get(r["difficulty"])
-        if not lv:
-            return
-        url = (f"https://donderhiroba.jp/score_detail.php"
-               f"?song_no={song_no}&level={lv}")
-        webbrowser.open(url)
+        title = r["title"] or ""
+        self.clipboard_clear()
+        self.clipboard_append(title)
+        self._set_status(f"已複製曲名：{title}（可到 donderhiroba 選曲頁貼上搜尋）。")
 
     def _export(self, fmt):
         if not self.rows:
