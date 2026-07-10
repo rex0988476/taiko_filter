@@ -186,13 +186,22 @@ class TaikoGUI(tk.Tk):
         ttk.Combobox(cframe, textvariable=self.lang_var, width=7, state="readonly",
                      values=["zh-tw", "zh-cn", "ja", "en", "ko"]).grid(row=0, column=8)
 
+        tk.Label(cframe, text="搜尋曲名", bg="#141414", fg="#bbbbbb").grid(
+            row=0, column=9, padx=(20, 4))
+        self.query_var = tk.StringVar()
+        q_entry = tk.Entry(cframe, textvariable=self.query_var, width=16,
+                           bg="#1e1e1e", fg="#e6e6e6", insertbackground="#e6e6e6",
+                           relief="flat")
+        q_entry.grid(row=0, column=10, ipady=3)
+        q_entry.bind("<Return>", lambda e: self.search())
+
         tk.Button(cframe, text="🔍 篩選", command=self.search,
                   bg="#e15b5b", fg="white", font=(UI_FONT, 11, "bold"),
                   relief="flat", padx=18, pady=4, cursor="hand2").grid(
-            row=0, column=9, padx=16)
+            row=0, column=11, padx=16)
         tk.Button(cframe, text="清除選取", command=self._clear_selection,
                   bg="#444", fg="white", relief="flat", padx=10, pady=4,
-                  cursor="hand2").grid(row=0, column=10)
+                  cursor="hand2").grid(row=0, column=12)
 
         # 播放清單工具列（介於星等列與標記列之間）
         pframe = tk.LabelFrame(self, text="  播放清單（不受篩選影響）  ",
@@ -343,6 +352,7 @@ class TaikoGUI(tk.Tk):
         for w in self.winfo_children():
             self._refresh_toggles(w)
         self.min_var.set(1); self.max_var.set(10)
+        self.query_var.set("")
         self._on_scale("min")
 
     def _refresh_toggles(self, widget):
@@ -394,6 +404,9 @@ class TaikoGUI(tk.Tk):
 
         self.rows = tf.build_rows(self.songs, genres, diffs, lo, hi, lang,
                                   include_deleted=False)
+        query = self.query_var.get().strip().lower()
+        if query:
+            self.rows = [r for r in self.rows if query in (r["title"] or "").lower()]
         self._populate()
 
     def _populate(self):
