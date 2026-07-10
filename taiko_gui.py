@@ -51,6 +51,9 @@ DEFAULT_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 # 標記檔（JSON；本地 GUI 與 GitHub Pages 網頁皆可讀寫）
 MARKS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           "marks.json")
+# 播放清單檔（JSON；本地 GUI 專用）
+PLAYLISTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "playlists.json")
 # 標記狀態顯示文字（near = 快全良，會另附剩餘「可」數）
 MARK_LABEL = {"fc": "FC", "perfect": "全良", "near": "快全良"}
 MARK_FG = {"fc": "#7ec4ff", "perfect": "#ffd54a", "near": "#ffb066"}
@@ -103,6 +106,10 @@ class TaikoGUI(tk.Tk):
         self.lang_var = tk.StringVar(value="zh-tw")
         self.marks = {}              # {"songNo|difficulty": {...}}
         self._load_marks()
+        self.playlists = {}          # {"清單名稱": ["songNo|difficulty", ...]}
+        self.current_playlist = None # None = 「全部」（篩選）模式
+        self._song_index = None      # songNo -> song，供播放清單重建列用
+        self._load_playlists()
 
         self._build_style()
         self._build_widgets()
@@ -187,6 +194,59 @@ class TaikoGUI(tk.Tk):
                   bg="#444", fg="white", relief="flat", padx=10, pady=4,
                   cursor="hand2").grid(row=0, column=10)
 
+        # 播放清單工具列（介於星等列與標記列之間）
+        pframe = tk.LabelFrame(self, text="  播放清單（不受篩選影響）  ",
+                               bg="#141414", fg="#ffffff",
+                               font=(UI_FONT, 11, "bold"), bd=0)
+        pframe.pack(fill="x", **pad)
+        prow = tk.Frame(pframe, bg="#141414"); prow.pack(fill="x")
+
+        tk.Label(prow, text="檢視", bg="#141414", fg="#bbbbbb").pack(
+            side="left", padx=(0, 4))
+        self.mode_var = tk.StringVar(value="全部")
+        self.mode_combo = ttk.Combobox(prow, textvariable=self.mode_var, width=16,
+                                       state="readonly", values=["全部"])
+        self.mode_combo.pack(side="left")
+        self.mode_combo.bind("<<ComboboxSelected>>", self._on_mode_change)
+
+        tk.Label(prow, text="新增清單", bg="#141414", fg="#bbbbbb").pack(
+            side="left", padx=(16, 4))
+        self.new_pl_var = tk.StringVar()
+        ent = tk.Entry(prow, textvariable=self.new_pl_var, width=14,
+                       bg="#1e1e1e", fg="#e6e6e6", insertbackground="#e6e6e6",
+                       relief="flat")
+        ent.pack(side="left", ipady=3)
+        ent.bind("<Return>", lambda e: self._add_playlist())
+        tk.Button(prow, text="＋", command=self._add_playlist,
+                  bg="#2e8b57", fg="white", font=(UI_FONT, 11, "bold"),
+                  relief="flat", padx=10, pady=2, cursor="hand2").pack(
+            side="left", padx=(4, 0))
+
+        tk.Label(prow, text="管理", bg="#141414", fg="#bbbbbb").pack(
+            side="left", padx=(16, 4))
+        self.del_pl_var = tk.StringVar()
+        self.del_combo = ttk.Combobox(prow, textvariable=self.del_pl_var, width=14,
+                                      state="readonly", values=[])
+        self.del_combo.pack(side="left")
+        tk.Button(prow, text="刪除清單", command=self._delete_playlist,
+                  bg="#a33", fg="white", relief="flat", padx=10, pady=2,
+                  cursor="hand2").pack(side="left", padx=(4, 0))
+
+        prow2 = tk.Frame(pframe, bg="#141414"); prow2.pack(fill="x", pady=(4, 0))
+        tk.Label(prow2, text="目標清單", bg="#141414", fg="#bbbbbb").pack(
+            side="left", padx=(0, 4))
+        self.target_pl_var = tk.StringVar()
+        self.target_combo = ttk.Combobox(prow2, textvariable=self.target_pl_var,
+                                         width=16, state="readonly", values=[])
+        self.target_combo.pack(side="left")
+        tk.Button(prow2, text="加入所選曲目到清單", command=self._add_to_playlist,
+                  bg="#3a5f8a", fg="white", relief="flat", padx=12, pady=3,
+                  cursor="hand2").pack(side="left", padx=8)
+        tk.Button(prow2, text="從目前清單移除所選曲目",
+                  command=self._remove_from_playlist,
+                  bg="#8a5a3a", fg="white", relief="flat", padx=12, pady=3,
+                  cursor="hand2").pack(side="left")
+
         # 標記工具列
         mframe = tk.LabelFrame(self, text="  標記（先點選下方一列 → 選狀態 → 套用）  ",
                                bg="#141414", fg="#ffffff",
@@ -265,6 +325,8 @@ class TaikoGUI(tk.Tk):
                   bg="#2f6f63", fg="white", relief="flat", padx=10, pady=3,
                   cursor="hand2").pack(side="right", padx=4)
 
+        self._refresh_playlist_combos()
+
     # ------------------------------------------------------------- 事件
     def _on_scale(self, which):
         lo, hi = self.min_var.get(), self.max_var.get()
@@ -319,6 +381,10 @@ class TaikoGUI(tk.Tk):
         if self.songs is None:
             messagebox.showinfo("請稍候", "資料尚未載入完成。")
             return
+        # 篩選一律回到「全部」模式（播放清單不受篩選影響）
+        if self.current_playlist is not None:
+            self.current_playlist = None
+            self.mode_var.set("全部")
         genres = [c for c, v in self.genre_vars.items() if v.get()]
         diffs = [c for c, v in self.diff_vars.items() if v.get()]
         if not diffs:  # 未選難度 = 全部難度（與 CLI 一致）
@@ -442,6 +508,163 @@ class TaikoGUI(tk.Tk):
                              "（推送後線上即可查看）。")
         except OSError as exc:
             messagebox.showerror("儲存失敗", str(exc))
+
+    # ------------------------------------------------------------- 播放清單
+    def _load_playlists(self):
+        if os.path.exists(PLAYLISTS_FILE):
+            try:
+                with open(PLAYLISTS_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    self.playlists = {k: list(v) for k, v in data.items()}
+            except (OSError, ValueError):
+                self.playlists = {}
+
+    def _save_playlists(self):
+        try:
+            with open(PLAYLISTS_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.playlists, f, ensure_ascii=False, indent=2)
+        except OSError as exc:
+            messagebox.showerror("儲存失敗", str(exc))
+
+    def _refresh_playlist_combos(self):
+        names = list(self.playlists.keys())
+        self.mode_combo["values"] = ["全部"] + names
+        self.del_combo["values"] = names
+        self.target_combo["values"] = names
+        if self.mode_var.get() not in (["全部"] + names):
+            self.mode_var.set("全部")
+        if self.del_pl_var.get() not in names:
+            self.del_pl_var.set("")
+        if self.target_pl_var.get() not in names:
+            self.target_pl_var.set("")
+
+    def _rows_from_keys(self, keys):
+        """由 songNo|difficulty 清單重建結果列（保留清單順序）。"""
+        if not self.songs:
+            return []
+        if self._song_index is None:
+            self._song_index = {str(s.get("songNo")): s for s in self.songs}
+        lang = self.lang_var.get()
+        rows = []
+        for key in keys:
+            if "|" not in key:
+                continue
+            song_no, diff = key.split("|", 1)
+            s = self._song_index.get(str(song_no))
+            if not s:
+                continue
+            course = (s.get("courses") or {}).get(diff)
+            if not course:
+                continue
+            level = course.get("level")
+            if level is None:
+                continue
+            url = tf.SONG_PAGE.format(songNo=song_no)
+            if lang:
+                url += f"?lang={lang}"
+            rows.append({
+                "songNo": str(song_no),
+                "title": s.get("title") or s.get("titleEn") or s.get("romaji") or "",
+                "romaji": s.get("romaji") or "",
+                "genres": s.get("genre") or [],
+                "difficulty": diff,
+                "level": level,
+                "url": url,
+            })
+        return rows
+
+    def _on_mode_change(self, event=None):
+        sel = self.mode_var.get()
+        self.current_playlist = None if sel == "全部" else sel
+        if self.current_playlist is None:
+            self.search()
+        else:
+            if self.songs is None:
+                messagebox.showinfo("請稍候", "資料尚未載入完成。")
+                return
+            self.rows = self._rows_from_keys(
+                self.playlists.get(self.current_playlist, []))
+            self._populate()
+            self._set_status(
+                f"播放清單「{self.current_playlist}」：共 {len(self.rows)} 首"
+                "（不受篩選影響；可選一列後按「從目前清單移除所選曲目」）。")
+
+    def _add_playlist(self):
+        name = self.new_pl_var.get().strip()
+        if not name:
+            messagebox.showinfo("請輸入名稱", "請先輸入播放清單名稱。")
+            return
+        if name == "全部" or name in self.playlists:
+            messagebox.showwarning("名稱重複", "已存在同名清單或使用保留字「全部」。")
+            return
+        self.playlists[name] = []
+        self._save_playlists()
+        self._refresh_playlist_combos()
+        self.new_pl_var.set("")
+        self.target_pl_var.set(name)
+        self._set_status(f"已新增播放清單：{name}")
+
+    def _delete_playlist(self):
+        name = self.del_pl_var.get()
+        if not name or name not in self.playlists:
+            messagebox.showinfo("未選擇", "請在「管理」下拉選單選擇要刪除的清單。")
+            return
+        if not messagebox.askyesno("確認刪除", f"確定刪除播放清單「{name}」？"):
+            return
+        self.playlists.pop(name, None)
+        self._save_playlists()
+        back_to_all = (self.current_playlist == name)
+        if back_to_all:
+            self.current_playlist = None
+            self.mode_var.set("全部")
+        self._refresh_playlist_combos()
+        if back_to_all:
+            self.search()
+        self._set_status(f"已刪除播放清單：{name}")
+
+    def _add_to_playlist(self):
+        target = self.target_pl_var.get()
+        if not target or target not in self.playlists:
+            messagebox.showinfo("未選擇清單", "請先在「目標清單」下拉選單選擇要加入的清單。")
+            return
+        sel = self.tree.selection()
+        if not sel:
+            messagebox.showinfo("未選取", "請先在下方表格點選要加入的曲目。")
+            return
+        r = self.rows[int(sel[0])]
+        key = self._mark_key(r)
+        lst = self.playlists[target]
+        if key in lst:
+            self._set_status(f"「{r['title']}」已在清單「{target}」中。")
+            return
+        lst.append(key)
+        self._save_playlists()
+        self._set_status(
+            f"已加入「{r['title']}（"
+            f"{tf.DIFF_LABEL.get(r['difficulty'], r['difficulty'])}）"
+            f"」到清單「{target}」。")
+
+    def _remove_from_playlist(self):
+        if self.current_playlist is None:
+            messagebox.showinfo("非清單檢視",
+                                "請先在「檢視」選擇某個播放清單，才能從中移除曲目。")
+            return
+        sel = self.tree.selection()
+        if not sel:
+            messagebox.showinfo("未選取", "請先點選要移除的曲目。")
+            return
+        r = self.rows[int(sel[0])]
+        key = self._mark_key(r)
+        lst = self.playlists.get(self.current_playlist, [])
+        if key not in lst:
+            return
+        lst.remove(key)
+        self._save_playlists()
+        self.rows = self._rows_from_keys(lst)
+        self._populate()
+        self._set_status(
+            f"已從清單「{self.current_playlist}」移除「{r['title']}」。")
 
     # ----------------------------------------------------- 開啟 / 匯出
     def _open_selected(self, event=None):

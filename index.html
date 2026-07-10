@@ -169,6 +169,11 @@
       <option value="ko">ko</option>
     </select>
 
+    <label>播放清單</label>
+    <select id="playlistSel">
+      <option value="__all__">全部</option>
+    </select>
+
     <button class="action btn-search" id="btnSearch">🔍 篩選</button>
     <button class="action btn-clear" id="btnClear">清除選取</button>
   </div>
@@ -221,6 +226,12 @@ const MARK_LABEL = { fc: "FC", perfect: "全良", near: "快全良" };
 const MARK_COLOR = { fc: "#7ec4ff", perfect: "#ffd54a", near: "#ffb066" };
 const MARKS_FILE = "marks.json";
 let MARKS = {};
+
+/* 播放清單（與本地 GUI 共用 playlists.json；網頁為唯讀檢視） */
+const PLAYLISTS_FILE = "playlists.json";
+let PLAYLISTS = {};
+let SONG_INDEX = null;         // songNo -> song
+let currentPlaylist = null;    // null = 「全部」（篩選模式）
 
 const SONG_PAGE = "https://taiko.wiki/song/";
 /* 資料來源：優先讀同資料夾快照，失敗再退回 GitHub 鏡像 */
@@ -380,6 +391,10 @@ function sortBy(col) {
 /* ------------------------------------------------------------------ 事件 */
 function search() {
   if (!SONGS) { alert("資料尚未載入完成。"); return; }
+  /* 篩選一律回到「全部」模式（播放清單不受篩選影響） */
+  currentPlaylist = null;
+  const ps = document.getElementById("playlistSel");
+  if (ps) ps.value = "__all__";
   const genres = Object.keys(genreSel).filter(c => genreSel[c]);
   let diffs = Object.keys(diffSel).filter(c => diffSel[c]);
   if (!diffs.length) diffs = Object.keys(DIFF_ORDER);   // 未選 = 全部難度
@@ -404,6 +419,60 @@ function clearSelection() {
 function openSelected() {
   if (!selectedTr) { alert("請先點選一列。"); return; }
   window.open(ROWS[+selectedTr.dataset.idx].url, "_blank");
+}
+
+/* ------------------------------------------------------------------ 播放清單 */
+function rowsFromKeys(keys) {
+  if (!SONGS) return [];
+  if (!SONG_INDEX) {
+    SONG_INDEX = {};
+    for (const s of SONGS) SONG_INDEX[String(s.songNo)] = s;
+  }
+  const lang = document.getElementById("langSel").value;
+  const rows = [];
+  for (const key of keys) {
+    if (!key.includes("|")) continue;
+    const [songNo, diff] = key.split("|");
+    const s = SONG_INDEX[String(songNo)];
+    if (!s) continue;
+    const course = (s.courses || {})[diff];
+    if (!course) continue;
+    const level = course.level;
+    if (level === null || level === undefined) continue;
+    let url = SONG_PAGE + songNo;
+    if (lang) url += `?lang=${lang}`;
+    rows.push({
+      songNo: String(songNo),
+      title: s.title || s.titleEn || s.romaji || "",
+      romaji: s.romaji || "",
+      genres: s.genre || [],
+      difficulty: diff,
+      level,
+      url,
+    });
+  }
+  return rows;
+}
+function onPlaylistChange() {
+  const v = document.getElementById("playlistSel").value;
+  currentPlaylist = (v === "__all__") ? null : v;
+  if (!currentPlaylist) { search(); return; }
+  if (!SONGS) { alert("資料尚未載入完成。"); return; }
+  ROWS = rowsFromKeys(PLAYLISTS[currentPlaylist] || []);
+  populate();
+  setStatus(`播放清單「${currentPlaylist}」：共 ${ROWS.length} 首（不受篩選影響）。`);
+}
+function refreshPlaylistSelect() {
+  const sel = document.getElementById("playlistSel");
+  sel.innerHTML = "";
+  const all = document.createElement("option");
+  all.value = "__all__"; all.textContent = "全部";
+  sel.appendChild(all);
+  for (const name of Object.keys(PLAYLISTS)) {
+    const o = document.createElement("option");
+    o.value = name; o.textContent = name;
+    sel.appendChild(o);
+  }
 }
 
 /* ------------------------------------------------------------------ 匯出 */
@@ -469,6 +538,18 @@ async function loadMarks() {
     console.warn("marks.json 未載入（尚無標記檔屬正常）：", e);
   }
 }
+async function loadPlaylists() {
+  try {
+    const resp = await fetch(PLAYLISTS_FILE, { cache: "no-cache" });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data && typeof data === "object") PLAYLISTS = data;
+    }
+  } catch (e) {
+    console.warn("playlists.json 未載入（尚無清單檔屬正常）：", e);
+  }
+  refreshPlaylistSelect();
+}
 async function loadSongs() {
   for (const [label, url] of [["本地 database.json", LOCAL_DB],
                               ["GitHub 鏡像", DB_MIRROR]]) {
@@ -498,11 +579,13 @@ function init() {
   buildToggles("diffToggles", DIFF_LABEL, DIFF_COLORS, diffSel);
 
   loadMarks();
+  loadPlaylists();
   document.getElementById("minRange").addEventListener("input", syncStars);
   document.getElementById("maxRange").addEventListener("input", syncStars);
   document.getElementById("btnSearch").addEventListener("click", search);
   document.getElementById("btnClear").addEventListener("click", clearSelection);
   document.getElementById("btnOpen").addEventListener("click", openSelected);
+  document.getElementById("playlistSel").addEventListener("change", onPlaylistChange);
   document.querySelectorAll(".btn-export").forEach(b =>
     b.addEventListener("click", () => exportData(b.dataset.fmt)));
   document.querySelectorAll("thead th").forEach(th =>
