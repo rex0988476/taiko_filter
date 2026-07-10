@@ -149,23 +149,30 @@
 
     thead { display: none; }
     .table-scroll { max-height: none; overflow: visible; border: none; }
-    table, tbody, tr, td { display: block; width: 100%; }
+    table, tbody { display: block; width: 100%; }
     tbody tr {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
       margin-bottom: 12px; border: 1px solid #333; border-radius: 8px;
-      overflow: hidden; background: #1e1e1e;
+      padding: 10px 12px; background: #1e1e1e;
     }
     tbody tr:nth-child(odd), tbody tr:nth-child(even) { background: #1e1e1e; }
     tbody tr:hover { background: #1e1e1e; }
-    tbody td {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 12px; text-align: right; padding: 8px 12px;
+    tbody td { display: inline-block; padding: 0; text-align: left; }
+    tbody td::before { display: none; }          /* 不顯示欄位標題 */
+
+    /* 星數、難度、類型：同一橫排 */
+    tbody td[data-label="★"] { color: #ffd54a; font-weight: bold; }
+    tbody td[data-label="難度"],
+    tbody td[data-label="類型"] { color: #cfd6e6; font-size: 14px; }
+
+    /* 曲名：獨立一排、放大明顯 */
+    tbody td.title-cell {
+      flex: 1 1 100%; font-size: 19px; font-weight: bold; line-height: 1.35;
+      margin-top: 3px;
     }
-    tbody td:empty { display: none; }
-    tbody td::before {
-      content: attr(data-label); color: #8fa1c7; font-weight: bold;
-      text-align: left; flex: 0 0 auto;
-    }
-    tbody td.title-cell { font-weight: bold; }
+    /* 標記：獨立一排 */
+    tbody td[data-label="標記"] { flex: 1 1 100%; font-weight: bold; }
+    tbody td[data-label="標記"]:empty { display: none; }
 
     /* 整張卡片著色（全良彩虹、FC 金、快全良綠） */
     tbody tr.mark-perfect {
@@ -173,15 +180,9 @@
     }
     tbody tr.mark-fc { background: #d4af37; }
     tbody tr.mark-near { background: #2e8b57; }
-    tbody tr.mark-perfect td,
-    tbody tr.mark-fc td,
-    tbody tr.mark-near td { background: transparent !important; }
     tbody tr.mark-perfect td { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
     tbody tr.mark-fc td { color: #1a1a1a; }
     tbody tr.mark-near td { color: #fff; }
-    tbody tr.mark-perfect td::before,
-    tbody tr.mark-near td::before { color: #ffffff; opacity: .85; }
-    tbody tr.mark-fc td::before { color: #1a1a1a; opacity: .8; }
   }
 </style>
 </head>
