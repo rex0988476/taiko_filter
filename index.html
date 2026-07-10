@@ -171,6 +171,7 @@
           <th data-col="diff" class="center">難度</th>
           <th data-col="genre" class="center">類型</th>
           <th data-col="title">曲名（雙擊開啟 taiko.wiki）</th>
+          <th data-col="mark" class="center">標記</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -204,6 +205,12 @@ const DIFF_COLORS = {
   easy: "#e8462b", normal: "#5f8f3a", hard: "#2f6f63", oni: "#d61e8c", ura: "#7a3ff0",
 };
 const DIFF_ORDER = { easy: 0, normal: 1, hard: 2, oni: 3, ura: 4 };
+
+/* 標記（與本地 GUI 共用 marks.json；label/color 供顯示） */
+const MARK_LABEL = { fc: "FC", perfect: "全良", near: "快全良" };
+const MARK_COLOR = { fc: "#7ec4ff", perfect: "#ffd54a", near: "#ffb066" };
+const MARKS_FILE = "marks.json";
+let MARKS = {};
 
 const SONG_PAGE = "https://taiko.wiki/song/";
 /* 資料來源：優先讀同資料夾快照，失敗再退回 GitHub 鏡像 */
@@ -296,7 +303,8 @@ function populate() {
       `<td class="center">★${r.level}</td>` +
       `<td class="center">${DIFF_LABEL[r.difficulty] || r.difficulty}</td>` +
       `<td class="center">${gnr}</td>` +
-      `<td>${escapeHtml(r.title)}</td>`;
+      `<td>${escapeHtml(r.title)}</td>` +
+      markCell(r);
     tr.addEventListener("click", () => selectRow(tr));
     tr.addEventListener("dblclick", () => window.open(r.url, "_blank"));
     frag.appendChild(tr);
@@ -315,6 +323,24 @@ function escapeHtml(s) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+/* 標記顯示（讀取 marks.json；鍵 = songNo|difficulty） */
+function markInfo(r) {
+  return MARKS[`${r.songNo}|${r.difficulty}`] || null;
+}
+function markText(r) {
+  const m = markInfo(r);
+  if (!m) return "";
+  if (m.status === "near") return `快全良(可${m.remaining ?? "?"})`;
+  return MARK_LABEL[m.status] || "";
+}
+function markCell(r) {
+  const m = markInfo(r);
+  const txt = markText(r);
+  if (!txt) return `<td class="center"></td>`;
+  const color = MARK_COLOR[m.status] || "#fff";
+  return `<td class="center" style="color:${color};font-weight:bold">${escapeHtml(txt)}</td>`;
+}
+
 /* ------------------------------------------------------------------ 排序（點表頭） */
 function sortBy(col) {
   const keyers = {
@@ -322,6 +348,10 @@ function sortBy(col) {
     diff:  (r) => [DIFF_ORDER[r.difficulty]],
     genre: (r) => [r.genres[0] || ""],
     title: (r) => [r.title],
+    mark:  (r) => { const m = markInfo(r);
+                    const o = { fc: 3, perfect: 2, near: 1 };
+                    return [m ? (o[m.status] || 0) : 0,
+                            m && m.status === "near" ? (m.remaining || 0) : 0]; },
   };
   const k = keyers[col];
   ROWS.sort((a, b) => {
@@ -369,13 +399,13 @@ function exportData(fmt) {
   if (!ROWS.length) { alert("請先篩選出結果再匯出。"); return; }
   let text, mime, name;
   if (fmt === "csv") {
-    const head = ["songNo","level","difficulty","difficulty_zh","genres","title","romaji","url"];
+    const head = ["songNo","level","difficulty","difficulty_zh","genres","title","romaji","mark","url"];
     const lines = [head.join(",")];
     for (const r of ROWS) {
       lines.push([
         r.songNo, r.level, r.difficulty,
         DIFF_LABEL[r.difficulty] || r.difficulty,
-        r.genres.join("/"), r.title, r.romaji, r.url
+        r.genres.join("/"), r.title, r.romaji, markText(r), r.url
       ].map(csvCell).join(","));
     }
     text = "\ufeff" + lines.join("\r\n");
@@ -419,6 +449,14 @@ function syncStars() {
 }
 
 /* ------------------------------------------------------------------ 載入資料 */
+async function loadMarks() {
+  try {
+    const resp = await fetch(MARKS_FILE, { cache: "no-cache" });
+    if (resp.ok) MARKS = await resp.json();
+  } catch (e) {
+    console.warn("marks.json 未載入（尚無標記檔屬正常）：", e);
+  }
+}
 async function loadSongs() {
   for (const [label, url] of [["本地 database.json", LOCAL_DB],
                               ["GitHub 鏡像", DB_MIRROR]]) {
@@ -447,6 +485,7 @@ function init() {
   buildToggles("genreToggles", GENRE_LABEL, GENRE_COLORS, genreSel);
   buildToggles("diffToggles", DIFF_LABEL, DIFF_COLORS, diffSel);
 
+  loadMarks();
   document.getElementById("minRange").addEventListener("input", syncStars);
   document.getElementById("maxRange").addEventListener("input", syncStars);
   document.getElementById("btnSearch").addEventListener("click", search);

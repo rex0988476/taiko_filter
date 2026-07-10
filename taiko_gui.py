@@ -20,6 +20,7 @@ import os
 import sys
 import csv
 import io
+import json
 import threading
 import webbrowser
 import tkinter as tk
@@ -47,6 +48,12 @@ DIFF_COLORS = {
 }
 DEFAULT_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           "database.json")
+# 標記檔（JSON；本地 GUI 與 GitHub Pages 網頁皆可讀寫）
+MARKS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "marks.json")
+# 標記狀態顯示文字（near = 快全良，會另附剩餘「可」數）
+MARK_LABEL = {"fc": "FC", "perfect": "全良", "near": "快全良"}
+MARK_FG = {"fc": "#7ec4ff", "perfect": "#ffd54a", "near": "#ffb066"}
 
 # 依作業系統挑選可正確顯示中日文的字型（找不到時 Tk 會自動退回預設）
 if sys.platform.startswith("win"):
@@ -94,6 +101,8 @@ class TaikoGUI(tk.Tk):
         self.genre_vars = {}
         self.diff_vars = {}
         self.lang_var = tk.StringVar(value="zh-tw")
+        self.marks = {}              # {"songNo|difficulty": {...}}
+        self._load_marks()
 
         self._build_style()
         self._build_widgets()
@@ -178,16 +187,49 @@ class TaikoGUI(tk.Tk):
                   bg="#444", fg="white", relief="flat", padx=10, pady=4,
                   cursor="hand2").grid(row=0, column=10)
 
+        # 標記工具列
+        mframe = tk.LabelFrame(self, text="  標記（先點選下方一列 → 選狀態 → 套用）  ",
+                               bg="#141414", fg="#ffffff",
+                               font=(UI_FONT, 11, "bold"), bd=0)
+        mframe.pack(fill="x", **pad)
+        mrow = tk.Frame(mframe, bg="#141414"); mrow.pack(fill="x")
+
+        self.mark_status_var = tk.StringVar(value="none")
+        for text, val in (("未標記", "none"), ("FC", "fc"),
+                          ("全良", "perfect"), ("快全良", "near")):
+            tk.Radiobutton(mrow, text=text, value=val,
+                           variable=self.mark_status_var,
+                           command=self._on_mark_mode,
+                           bg="#141414", fg="#e6e6e6", selectcolor="#2b2b2b",
+                           activebackground="#141414", activeforeground="#fff",
+                           font=(UI_FONT, 10)).pack(side="left", padx=4)
+
+        tk.Label(mrow, text="剩餘「可」", bg="#141414", fg="#bbbbbb").pack(
+            side="left", padx=(12, 4))
+        self.remaining_var = tk.IntVar(value=0)
+        self.remaining_spin = tk.Spinbox(mrow, from_=0, to=999, width=5,
+                                         textvariable=self.remaining_var,
+                                         state="disabled")
+        self.remaining_spin.pack(side="left")
+
+        tk.Button(mrow, text="套用到選取列", command=self._apply_mark,
+                  bg="#6a5acd", fg="white", relief="flat", padx=12, pady=3,
+                  cursor="hand2").pack(side="left", padx=12)
+        tk.Button(mrow, text="💾 儲存標記", command=self._save_marks,
+                  bg="#2e8b57", fg="white", font=(UI_FONT, 10, "bold"),
+                  relief="flat", padx=12, pady=3, cursor="hand2").pack(side="left")
+
         # 結果表格
         tframe = tk.Frame(self, bg="#141414"); tframe.pack(fill="both", expand=True,
                                                            padx=10, pady=(6, 2))
-        cols = ("star", "diff", "genre", "title")
+        cols = ("star", "diff", "genre", "title", "mark")
         self.tree = ttk.Treeview(tframe, columns=cols, show="headings",
                                  selectmode="browse")
         for c, txt, w, anc in (("star", "★", 60, "center"),
                                ("diff", "難度", 90, "center"),
                                ("genre", "類型", 150, "center"),
-                               ("title", "曲名（雙擊開啟 taiko.wiki）", 560, "w")):
+                               ("title", "曲名（雙擊開啟 taiko.wiki）", 470, "w"),
+                               ("mark", "標記", 110, "center")):
             self.tree.heading(c, text=txt,
                               command=lambda cc=c: self._sort_by(cc))
             self.tree.column(c, width=w, anchor=anc)
@@ -196,6 +238,7 @@ class TaikoGUI(tk.Tk):
         self.tree.pack(side="left", fill="both", expand=True)
         vsb.pack(side="right", fill="y")
         self.tree.bind("<Double-1>", self._open_selected)
+        self.tree.bind("<<TreeviewSelect>>", self._on_row_select)
         self.tree.tag_configure("odd", background="#232323")
         self.tree.tag_configure("even", background="#1b1b1b")
 
@@ -287,7 +330,8 @@ class TaikoGUI(tk.Tk):
             gnr = "/".join(tf.GENRE_LABEL.get(g, g) for g in r["genres"])
             tag = "odd" if i % 2 else "even"
             self.tree.insert("", "end", iid=str(i),
-                             values=(f"★{r['level']}", diff, gnr, r["title"]),
+                             values=(f"★{r['level']}", diff, gnr, r["title"],
+                                     self._mark_text(r)),
                              tags=(tag,))
         self._set_status(f"符合條件共 {len(self.rows)} 筆。雙擊任一列可開啟 taiko.wiki。")
 
@@ -295,9 +339,96 @@ class TaikoGUI(tk.Tk):
         key = {"star": lambda r: (r["level"], tf.DIFF_ORDER[r["difficulty"]]),
                "diff": lambda r: tf.DIFF_ORDER[r["difficulty"]],
                "genre": lambda r: r["genres"][0] if r["genres"] else "",
-               "title": lambda r: r["title"]}[col]
+               "title": lambda r: r["title"],
+               "mark": lambda r: self._mark_sort_key(r)}[col]
         self.rows.sort(key=key)
         self._populate()
+
+    # ------------------------------------------------------------- 標記
+    @staticmethod
+    def _mark_key(r):
+        return f"{r['songNo']}|{r['difficulty']}"
+
+    def _mark_text(self, r):
+        m = self.marks.get(self._mark_key(r))
+        if not m:
+            return ""
+        st = m.get("status")
+        if st == "near":
+            return f"快全良(可{m.get('remaining', '?')})"
+        return MARK_LABEL.get(st, "")
+
+    def _mark_sort_key(self, r):
+        # 排序權重：未標記 < 快全良 < 全良 < FC；快全良再依剩餘可數（少者較前）
+        order = {"": 0, "near": 1, "perfect": 2, "fc": 3}
+        m = self.marks.get(self._mark_key(r))
+        st = m.get("status") if m else ""
+        rem = m.get("remaining", 0) if (m and m.get("status") == "near") else 0
+        return (order.get(st, 0), rem)
+
+    def _on_mark_mode(self):
+        state = "normal" if self.mark_status_var.get() == "near" else "disabled"
+        self.remaining_spin.config(state=state)
+
+    def _on_row_select(self, event=None):
+        sel = self.tree.selection()
+        if not sel:
+            return
+        r = self.rows[int(sel[0])]
+        m = self.marks.get(self._mark_key(r))
+        if not m:
+            self.mark_status_var.set("none")
+            self.remaining_var.set(0)
+        else:
+            self.mark_status_var.set(m.get("status", "none"))
+            self.remaining_var.set(m.get("remaining", 0)
+                                   if m.get("status") == "near" else 0)
+        self._on_mark_mode()
+
+    def _apply_mark(self):
+        sel = self.tree.selection()
+        if not sel:
+            messagebox.showinfo("未選取", "請先在下方表格點選一列，再套用標記。")
+            return
+        r = self.rows[int(sel[0])]
+        key = self._mark_key(r)
+        st = self.mark_status_var.get()
+        if st == "none":
+            self.marks.pop(key, None)
+        elif st == "near":
+            try:
+                n = int(self.remaining_var.get())
+            except (ValueError, tk.TclError):
+                messagebox.showwarning("輸入錯誤", "請輸入剩餘『可』的數量（整數）。")
+                return
+            if n < 0:
+                messagebox.showwarning("輸入錯誤", "剩餘『可』的數量不可為負。")
+                return
+            self.marks[key] = {"status": "near", "remaining": n}
+        else:
+            self.marks[key] = {"status": st}
+        self.tree.set(sel[0], "mark", self._mark_text(r))
+        shown = self._mark_text(r) or "未標記"
+        self._set_status(f"已標記：{r['title']}（"
+                         f"{tf.DIFF_LABEL.get(r['difficulty'], r['difficulty'])}）"
+                         f"→ {shown}　（記得按「💾 儲存標記」寫入檔案）")
+
+    def _load_marks(self):
+        if os.path.exists(MARKS_FILE):
+            try:
+                with open(MARKS_FILE, "r", encoding="utf-8") as f:
+                    self.marks = json.load(f)
+            except (OSError, ValueError):
+                self.marks = {}
+
+    def _save_marks(self):
+        try:
+            with open(MARKS_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.marks, f, ensure_ascii=False, indent=2)
+            self._set_status(f"已儲存 {len(self.marks)} 筆標記至 marks.json"
+                             "（推送後線上即可查看）。")
+        except OSError as exc:
+            messagebox.showerror("儲存失敗", str(exc))
 
     # ----------------------------------------------------- 開啟 / 匯出
     def _open_selected(self, event=None):
