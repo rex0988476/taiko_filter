@@ -81,6 +81,11 @@
     background: var(--panel); color: var(--text);
     border: 1px solid #444; border-radius: 4px; padding: 4px 8px;
   }
+  a.donder {
+    text-decoration: none; margin-left: 8px; font-size: 13px; opacity: .85;
+    white-space: nowrap;
+  }
+  a.donder:hover { opacity: 1; }
   input[type="text"].search {
     background: var(--panel); color: var(--text);
     border: 1px solid #444; border-radius: 4px; padding: 5px 10px;
@@ -288,6 +293,9 @@ const DIFF_COLORS = {
 };
 const DIFF_ORDER = { easy: 0, normal: 1, hard: 2, oni: 3, ura: 4 };
 
+/* 難度 -> donderhiroba 的 level 參數（官方 song_no 相同） */
+const DONDER_LEVEL = { easy: 1, normal: 2, hard: 3, oni: 4, ura: 5 };
+
 /* 標記（與本地 GUI 共用 marks.json；label/color 供顯示） */
 const MARK_LABEL = { fc: "FC", perfect: "全良", near: "快全良" };
 const MARK_COLOR = { fc: "#7ec4ff", perfect: "#ffd54a", near: "#ffb066" };
@@ -394,7 +402,7 @@ function populate() {
       `<td class="center" data-label="★">★${r.level}</td>` +
       `<td class="center" data-label="難度">${DIFF_LABEL[r.difficulty] || r.difficulty}</td>` +
       `<td class="center" data-label="類型">${gnr}</td>` +
-      `<td class="title-cell" data-label="曲名">${escapeHtml(r.title)}</td>` +
+      `<td class="title-cell" data-label="曲名">${escapeHtml(r.title)}${donderLink(r)}</td>` +
       markCell(r);
     tr.addEventListener("click", () => selectRow(tr));
     tr.addEventListener("dblclick", () => window.open(r.url, "_blank"));
@@ -429,6 +437,15 @@ function markCell(r) {
   const txt = markText(r);
   if (!txt) return `<td class="center" data-label="標記"></td>`;
   return `<td class="center" data-label="標記">${escapeHtml(txt)}</td>`;
+}
+/* donderhiroba 連結（僅數字 songNo；點了可到該曲頁面按★加最愛） */
+function donderLink(r) {
+  if (!/^\d+$/.test(String(r.songNo))) return "";
+  const lv = DONDER_LEVEL[r.difficulty];
+  if (!lv) return "";
+  const url = `https://donderhiroba.jp/score_detail.php?song_no=${r.songNo}&level=${lv}`;
+  return ` <a class="donder" href="${url}" target="_blank" rel="noopener"` +
+         ` title="在 donderhiroba 開啟（可加最愛）" onclick="event.stopPropagation()">🔗</a>`;
 }
 
 /* ------------------------------------------------------------------ 排序（點表頭） */
