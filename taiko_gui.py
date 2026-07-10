@@ -241,6 +241,13 @@ class TaikoGUI(tk.Tk):
         self.tree.bind("<<TreeviewSelect>>", self._on_row_select)
         self.tree.tag_configure("odd", background="#232323")
         self.tree.tag_configure("even", background="#1b1b1b")
+        # 依標記狀態的整列底色（全良：藍、FC：金、快全良：綠）
+        self.tree.tag_configure("mark_perfect", background="#2f6fed",
+                                foreground="#ffffff")
+        self.tree.tag_configure("mark_fc", background="#d4af37",
+                                foreground="#1a1a1a")
+        self.tree.tag_configure("mark_near", background="#2e8b57",
+                                foreground="#ffffff")
 
         # 底部：狀態列 + 匯出
         bframe = tk.Frame(self, bg="#141414"); bframe.pack(fill="x", padx=10,
@@ -328,11 +335,10 @@ class TaikoGUI(tk.Tk):
         for i, r in enumerate(self.rows):
             diff = tf.DIFF_LABEL.get(r["difficulty"], r["difficulty"])
             gnr = "/".join(tf.GENRE_LABEL.get(g, g) for g in r["genres"])
-            tag = "odd" if i % 2 else "even"
             self.tree.insert("", "end", iid=str(i),
                              values=(f"★{r['level']}", diff, gnr, r["title"],
                                      self._mark_text(r)),
-                             tags=(tag,))
+                             tags=(self._row_tag(r, i),))
         self._set_status(f"符合條件共 {len(self.rows)} 筆。雙擊任一列可開啟 taiko.wiki。")
 
     def _sort_by(self, col):
@@ -348,6 +354,12 @@ class TaikoGUI(tk.Tk):
     @staticmethod
     def _mark_key(r):
         return f"{r['songNo']}|{r['difficulty']}"
+
+    def _row_tag(self, r, i):
+        m = self.marks.get(self._mark_key(r))
+        if m and m.get("status") in ("perfect", "fc", "near"):
+            return "mark_" + m["status"]
+        return "odd" if i % 2 else "even"
 
     def _mark_text(self, r):
         m = self.marks.get(self._mark_key(r))
@@ -408,6 +420,7 @@ class TaikoGUI(tk.Tk):
         else:
             self.marks[key] = {"status": st}
         self.tree.set(sel[0], "mark", self._mark_text(r))
+        self.tree.item(sel[0], tags=(self._row_tag(r, int(sel[0])),))
         shown = self._mark_text(r) or "未標記"
         self._set_status(f"已標記：{r['title']}（"
                          f"{tf.DIFF_LABEL.get(r['difficulty'], r['difficulty'])}）"
