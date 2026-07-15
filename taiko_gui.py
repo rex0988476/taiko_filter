@@ -579,6 +579,10 @@ class TaikoGUI(tk.Tk):
                   bg="#3a5f8a", fg="white", relief="flat", padx=10, pady=2,
                   cursor="hand2").pack(side="left", padx=8)
 
+        tk.Label(win, text="（Firefox 免權限最順；Chrome/Edge 新版需以系統管理員執行）",
+                 bg="#141414", fg="#999999", font=(UI_FONT, 8),
+                 anchor="w").pack(fill="x", padx=12)
+
         tk.Label(win, text="或手動貼上 Cookie：", bg="#141414", fg="#ffffff",
                  font=(UI_FONT, 10, "bold")).pack(anchor="w", padx=12)
         cookie_txt = tk.Text(win, height=5, bg="#1e1e1e", fg="#e6e6e6",
@@ -757,10 +761,42 @@ class TaikoGUI(tk.Tk):
 
                 self.after(0, apply)
             except Exception as exc:
-                self.after(0, lambda e=exc:
-                           set_status(f"讀取失敗：{e}", err=True))
+                msg = str(exc)
+
+                def fail():
+                    if "admin" in msg.lower():
+                        set_status("Chrome/Edge 新版加密需要系統管理員權限；"
+                                   "建議改用 Firefox、以管理員重新啟動，或手動貼上。",
+                                   err=True)
+                        if messagebox.askyesno(
+                                "需要系統管理員權限",
+                                "Chrome/Edge 新版 cookie 加密需要系統管理員權限。\n"
+                                "要以系統管理員重新啟動本程式嗎？\n"
+                                "（或按「否」，改用 Firefox 一鍵讀取或手動貼上）"):
+                            self._restart_as_admin()
+                    else:
+                        set_status(f"讀取失敗：{msg}", err=True)
+
+                self.after(0, fail)
 
         threading.Thread(target=worker, daemon=True).start()
+
+    def _restart_as_admin(self):
+        """以系統管理員身分重新啟動本程式（Windows）。"""
+        if not sys.platform.startswith("win"):
+            messagebox.showinfo("不支援", "此功能僅限 Windows。")
+            return
+        try:
+            import ctypes
+            params = " ".join(f'"{a}"' for a in sys.argv)
+            rc = ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, params, None, 1)
+            if rc > 32:
+                self.destroy()
+            else:
+                messagebox.showerror("無法提權", "使用者已取消或提權失敗。")
+        except Exception as exc:
+            messagebox.showerror("無法提權", str(exc))
 
     # ------------------------------------------------------------- 播放清單
     def _load_playlists(self):
