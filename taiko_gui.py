@@ -21,10 +21,7 @@ import sys
 import csv
 import io
 import json
-import re
 import threading
-import urllib.request
-import urllib.parse
 import webbrowser
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -293,10 +290,6 @@ class TaikoGUI(tk.Tk):
         tk.Button(mrow, text="💾 儲存標記", command=self._save_marks,
                   bg="#2e8b57", fg="white", font=(UI_FONT, 10, "bold"),
                   relief="flat", padx=12, pady=3, cursor="hand2").pack(side="left")
-        tk.Button(mrow, text="⬇ 匯入 donderhiroba 成績",
-                  command=self._open_import_dialog,
-                  bg="#b06a2f", fg="white", relief="flat", padx=12, pady=3,
-                  cursor="hand2").pack(side="left", padx=(12, 0))
 
         # 結果表格
         tframe = tk.Frame(self, bg="#141414"); tframe.pack(fill="both", expand=True,
@@ -537,182 +530,6 @@ class TaikoGUI(tk.Tk):
                              "（推送後線上即可查看）。")
         except OSError as exc:
             messagebox.showerror("儲存失敗", str(exc))
-
-    def _save_marks_silent(self):
-        try:
-            with open(MARKS_FILE, "w", encoding="utf-8") as f:
-                json.dump(self.marks, f, ensure_ascii=False, indent=2)
-        except OSError:
-            pass
-
-    # ------------------------------------------------- donderhiroba 匯入成績
-    def _open_import_dialog(self):
-        win = tk.Toplevel(self)
-        win.title("從 donderhiroba 匯入成績")
-        win.configure(bg="#141414")
-        win.geometry("580x520")
-        win.transient(self)
-
-        info = (
-            "先用瀏覽器登入 donderhiroba（https://donderhiroba.jp），\n"
-            "再用下方「一鍵讀取」自動抓取 Cookie；或手動貼上亦可。\n"
-            "匯入後：虹冠(全良)→全良、金冠(全連)→FC 會寫入標記。\n\n"
-            "注意：以你的登入身分讀取自己的成績；Cookie 僅暫存記憶體、不寫檔。\n"
-            "此類操作屬非官方，可能違反 donderhiroba 使用條款，風險自負。"
-        )
-        tk.Label(win, text=info, bg="#141414", fg="#dddddd", justify="left",
-                 font=(UI_FONT, 9), anchor="w").pack(fill="x", padx=12, pady=(10, 6))
-
-        # 取得 Cookie（獨立小工具）
-        auto = tk.Frame(win, bg="#141414"); auto.pack(fill="x", padx=12, pady=(0, 6))
-        tk.Button(auto, text="🍪 開啟「取得 Cookie」工具",
-                  command=self._launch_cookie_tool,
-                  bg="#3a5f8a", fg="white", relief="flat", padx=10, pady=3,
-                  cursor="hand2").pack(side="left")
-        tk.Label(auto, text="讀取後會自動複製，回來按 Ctrl+V 貼到下方即可。",
-                 bg="#141414", fg="#999999", font=(UI_FONT, 8)).pack(
-            side="left", padx=8)
-
-        tk.Label(win, text="或手動貼上 Cookie：", bg="#141414", fg="#ffffff",
-                 font=(UI_FONT, 10, "bold")).pack(anchor="w", padx=12)
-        cookie_txt = tk.Text(win, height=5, bg="#1e1e1e", fg="#e6e6e6",
-                             insertbackground="#e6e6e6", relief="flat", wrap="word")
-        cookie_txt.pack(fill="x", padx=12, pady=(2, 8))
-
-        ov_var = tk.BooleanVar(value=False)
-        tk.Checkbutton(win, text="覆蓋已存在的標記（否則只填目前未標記的）",
-                       variable=ov_var, bg="#141414", fg="#e6e6e6",
-                       selectcolor="#2b2b2b", activebackground="#141414",
-                       activeforeground="#fff", font=(UI_FONT, 9)).pack(
-            anchor="w", padx=12)
-
-        status = tk.Label(win, text="", bg="#141414", fg="#9fe0a0",
-                          font=(UI_FONT, 9), justify="left", anchor="w",
-                          wraplength=540)
-        status.pack(fill="x", padx=12, pady=(8, 4))
-
-        btns = tk.Frame(win, bg="#141414"); btns.pack(fill="x", padx=12, pady=6)
-        start_btn = tk.Button(btns, text="開始匯入", bg="#2e8b57", fg="white",
-                              relief="flat", padx=14, pady=4, cursor="hand2")
-        start_btn.pack(side="right")
-        tk.Button(btns, text="關閉", command=win.destroy, bg="#444", fg="white",
-                  relief="flat", padx=12, pady=4, cursor="hand2").pack(
-            side="right", padx=6)
-
-        def set_status(text, err=False):
-            status.config(text=text, fg="#ff8a80" if err else "#9fe0a0")
-
-        def run_import():
-            cookie = cookie_txt.get("1.0", "end").strip()
-            if not cookie:
-                set_status("請先貼上 Cookie。", err=True)
-                return
-            overwrite = ov_var.get()
-            start_btn.config(state="disabled")
-            set_status("連線 donderhiroba 中…")
-
-            def worker():
-                try:
-                    applied, scanned = self._import_donder_scores(
-                        cookie, overwrite,
-                        lambda m: self.after(0, lambda mm=m: set_status(mm)))
-                    def done():
-                        if self.rows:
-                            self._populate()
-                        set_status(f"完成：掃描 {scanned} 筆記錄，寫入/更新 "
-                                   f"{applied} 個標記，已存 marks.json。")
-                        start_btn.config(state="normal")
-                    self.after(0, done)
-                except Exception as exc:
-                    self.after(0, lambda e=exc: (
-                        set_status(f"匯入失敗：{e}", err=True),
-                        start_btn.config(state="normal")))
-
-            threading.Thread(target=worker, daemon=True).start()
-
-        start_btn.config(command=run_import)
-
-    def _import_donder_scores(self, cookie, overwrite, progress):
-        """讀取 donderhiroba 各曲風成績，將虹冠/金冠映射為 全良/FC 標記。"""
-        base_headers = {
-            "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                           "AppleWebKit/537.36 (KHTML, like Gecko) "
-                           "Chrome/122.0 Safari/537.36"),
-            "Accept-Language": "ja,en;q=0.8",
-            "Cookie": cookie,
-        }
-
-        def fetch(url, data=None, extra=None):
-            headers = dict(base_headers)
-            if extra:
-                headers.update(extra)
-            req = urllib.request.Request(url, data=data, headers=headers)
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                return resp.read().decode("utf-8", errors="replace")
-
-        progress("驗證登入狀態…")
-        top = fetch("https://donderhiroba.jp/mypage_top.php")
-        if "_tckt" not in top and "mydon" not in top:
-            raise RuntimeError("Cookie 無效或未登入 donderhiroba。")
-        m = re.search(r'id="_tckt"[^>]*>([^<]+)<', top)
-        tckt = m.group(1).strip() if m else None
-
-        if tckt:
-            try:
-                progress("刷新成績快取…")
-                fetch("https://donderhiroba.jp/ajax/update_score.php",
-                      data=urllib.parse.urlencode({"_tckt": tckt}).encode(),
-                      extra={"Content-Type":
-                             "application/x-www-form-urlencoded; charset=UTF-8",
-                             "X-Requested-With": "XMLHttpRequest"})
-            except Exception:
-                pass
-
-        level_to_diff = {"1": "easy", "2": "normal", "3": "hard",
-                         "4": "oni", "5": "ura"}
-        crown_to_mark = {"donderfull": "perfect", "gold": "fc"}
-        anchor_re = re.compile(
-            r'score_detail\.php\?song_no=(\d+)(?:&amp;|&)level=(\d+)[^>]*>'
-            r'(.*?)</a>', re.DOTALL)
-        crown_re = re.compile(r'crown_button_([a-z]+)_\d+_640')
-
-        applied = 0
-        scanned = 0
-        for genre in range(1, 9):
-            progress(f"讀取成績（曲風 {genre}/8）…")
-            html = fetch(f"https://donderhiroba.jp/score_list.php?genre={genre}")
-            for song_no, level, inner in anchor_re.findall(html):
-                cm = crown_re.search(inner)
-                if not cm:
-                    continue
-                scanned += 1
-                mark = crown_to_mark.get(cm.group(1))
-                diff = level_to_diff.get(level)
-                if not mark or not diff:
-                    continue
-                key = f"{song_no}|{diff}"
-                if not overwrite and key in self.marks:
-                    continue
-                self.marks[key] = {"status": mark}
-                applied += 1
-
-        self._save_marks_silent()
-        return applied, scanned
-
-    def _launch_cookie_tool(self):
-        """另開獨立的『取得 Cookie』小工具（get_donder_cookie.py）。"""
-        import subprocess
-        tool = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "get_donder_cookie.py")
-        if not os.path.exists(tool):
-            messagebox.showerror(
-                "找不到工具",
-                "找不到 get_donder_cookie.py（應與本程式放在同一資料夾）。")
-            return
-        try:
-            subprocess.Popen([sys.executable, tool])
-        except Exception as exc:
-            messagebox.showerror("無法啟動", str(exc))
 
     # ------------------------------------------------------------- 播放清單
     def _load_playlists(self):
