@@ -550,22 +550,36 @@ class TaikoGUI(tk.Tk):
         win = tk.Toplevel(self)
         win.title("從 donderhiroba 匯入成績")
         win.configure(bg="#141414")
-        win.geometry("580x460")
+        win.geometry("580x520")
         win.transient(self)
 
         info = (
-            "說明：\n"
-            "1. 用瀏覽器登入 donderhiroba（https://donderhiroba.jp）。\n"
-            "2. 按 F12 → Network，重新整理頁面，點任一 donderhiroba 請求，\n"
-            "   在 Request Headers 找到整段 Cookie 複製貼到下方。\n"
-            "3. 按「開始匯入」：虹冠(全良)→全良、金冠(全連)→FC 會寫入標記。\n\n"
-            "注意：此功能以你的登入身分讀取自己的成績；Cookie 僅暫存記憶體、不寫檔。\n"
+            "先用瀏覽器登入 donderhiroba（https://donderhiroba.jp），\n"
+            "再用下方「一鍵讀取」自動抓取 Cookie；或手動貼上亦可。\n"
+            "匯入後：虹冠(全良)→全良、金冠(全連)→FC 會寫入標記。\n\n"
+            "注意：以你的登入身分讀取自己的成績；Cookie 僅暫存記憶體、不寫檔。\n"
             "此類操作屬非官方，可能違反 donderhiroba 使用條款，風險自負。"
         )
         tk.Label(win, text=info, bg="#141414", fg="#dddddd", justify="left",
                  font=(UI_FONT, 9), anchor="w").pack(fill="x", padx=12, pady=(10, 6))
 
-        tk.Label(win, text="貼上 Cookie：", bg="#141414", fg="#ffffff",
+        # 一鍵讀取（推薦）
+        auto = tk.Frame(win, bg="#141414"); auto.pack(fill="x", padx=12, pady=(0, 6))
+        tk.Label(auto, text="一鍵讀取（推薦）", bg="#141414", fg="#ffd54a",
+                 font=(UI_FONT, 10, "bold")).pack(side="left")
+        tk.Label(auto, text="瀏覽器", bg="#141414", fg="#bbbbbb").pack(
+            side="left", padx=(10, 4))
+        browser_var = tk.StringVar(value="chrome")
+        ttk.Combobox(auto, textvariable=browser_var, width=8, state="readonly",
+                     values=["chrome", "edge", "firefox", "brave",
+                             "opera"]).pack(side="left")
+        tk.Button(auto, text="🍪 讀取 Cookie",
+                  command=lambda: self._autofill_cookie(
+                      browser_var.get(), cookie_txt, set_status),
+                  bg="#3a5f8a", fg="white", relief="flat", padx=10, pady=2,
+                  cursor="hand2").pack(side="left", padx=8)
+
+        tk.Label(win, text="或手動貼上 Cookie：", bg="#141414", fg="#ffffff",
                  font=(UI_FONT, 10, "bold")).pack(anchor="w", padx=12)
         cookie_txt = tk.Text(win, height=5, bg="#1e1e1e", fg="#e6e6e6",
                              insertbackground="#e6e6e6", relief="flat", wrap="word")
@@ -690,6 +704,63 @@ class TaikoGUI(tk.Tk):
 
         self._save_marks_silent()
         return applied, scanned
+
+    def _autofill_cookie(self, browser, cookie_txt, set_status):
+        """用 browser_cookie3 直接讀取瀏覽器內 donderhiroba 的 Cookie。"""
+        try:
+            import browser_cookie3  # noqa: F401
+        except ImportError:
+            if not messagebox.askyesno(
+                    "需要安裝套件",
+                    "一鍵讀取需要 browser_cookie3 套件。\n要現在自動安裝嗎？"):
+                return
+            set_status("安裝 browser_cookie3 中…（可能需數十秒）")
+
+            def install():
+                import subprocess
+                try:
+                    subprocess.check_call([sys.executable, "-m", "pip",
+                                           "install", "browser_cookie3"])
+                    self.after(0, lambda: self._read_cookie(
+                        browser, cookie_txt, set_status))
+                except Exception as exc:
+                    self.after(0, lambda e=exc:
+                               set_status(f"安裝失敗：{e}", err=True))
+
+            threading.Thread(target=install, daemon=True).start()
+            return
+        self._read_cookie(browser, cookie_txt, set_status)
+
+    def _read_cookie(self, browser, cookie_txt, set_status):
+        set_status(f"從 {browser} 讀取 donderhiroba Cookie 中…")
+
+        def worker():
+            try:
+                import browser_cookie3
+                loader = getattr(browser_cookie3, browser, None)
+                if loader is None:
+                    self.after(0, lambda: set_status(
+                        f"不支援的瀏覽器：{browser}", err=True))
+                    return
+                cj = loader(domain_name="donderhiroba.jp")
+                pairs = [f"{c.name}={c.value}" for c in cj]
+
+                def apply():
+                    if not pairs:
+                        set_status("找不到 donderhiroba 的 Cookie，請先在"
+                                   f"「{browser}」登入該網站。", err=True)
+                        return
+                    cookie_txt.delete("1.0", "end")
+                    cookie_txt.insert("1.0", "; ".join(pairs))
+                    set_status(f"已讀取 {len(pairs)} 個 Cookie，"
+                               "可直接按「開始匯入」。")
+
+                self.after(0, apply)
+            except Exception as exc:
+                self.after(0, lambda e=exc:
+                           set_status(f"讀取失敗：{e}", err=True))
+
+        threading.Thread(target=worker, daemon=True).start()
 
     # ------------------------------------------------------------- 播放清單
     def _load_playlists(self):
