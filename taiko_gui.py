@@ -739,7 +739,14 @@ class TaikoGUI(tk.Tk):
         set_status(f"從 {browser} 讀取 donderhiroba Cookie 中…")
 
         def worker():
+            com_inited = False
             try:
+                try:
+                    import pythoncom
+                    pythoncom.CoInitialize()
+                    com_inited = True
+                except Exception:
+                    pass
                 import browser_cookie3
                 loader = getattr(browser_cookie3, browser, None)
                 if loader is None:
@@ -778,6 +785,13 @@ class TaikoGUI(tk.Tk):
                         set_status(f"讀取失敗：{msg}", err=True)
 
                 self.after(0, fail)
+            finally:
+                if com_inited:
+                    try:
+                        import pythoncom
+                        pythoncom.CoUninitialize()
+                    except Exception:
+                        pass
 
         threading.Thread(target=worker, daemon=True).start()
 
