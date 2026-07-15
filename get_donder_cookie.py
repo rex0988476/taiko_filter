@@ -187,7 +187,7 @@ class CookieTool(tk.Tk):
                 errors.append(f"{reader.__name__}: {exc}")
 
         msg = " ／ ".join(errors)
-        self.after(0, lambda m=msg: self._fail(m))
+        self.after(0, lambda m=msg, b=browser: self._fail(m, b))
 
     def _done(self, pairs, backend):
         cookie = "; ".join(f"{n}={v}" for n, v in pairs)
@@ -199,16 +199,29 @@ class CookieTool(tk.Tk):
         self._set_status(f"成功（{backend}）：讀到 {len(pairs)} 個 Cookie，"
                          "已自動複製到剪貼簿。回匯入視窗按 Ctrl+V 貼上。")
 
-    def _fail(self, msg):
+    def _fail(self, msg, browser=None):
         self.read_btn.config(state="normal")
         low = msg.lower()
-        if "admin" in low or "key for cookie" in low:
+        browser = browser or self.browser_var.get()
+        needs_special = ("key for cookie" in low or "admin" in low
+                         or "decrypt" in low)
+        if needs_special and not _module_available("rookiepy"):
+            if messagebox.askyesno(
+                    "建議安裝 rookiepy",
+                    "Chrome/Edge 新版加密用 browser_cookie3 讀不到。\n"
+                    "rookiepy 通常能處理（且免管理員）。\n"
+                    "要現在自動安裝 rookiepy 並重試嗎？"):
+                self._install_then_read("rookiepy", browser)
+                return
+            self._set_status(f"讀取失敗：{msg}", err=True)
+            return
+        if needs_special:
             self._set_status(
-                "Chrome/Edge 新版加密讀取失敗。可改用 Firefox、以系統管理員"
-                "重新啟動本工具，或安裝 rookiepy 後再試。詳情：" + msg, err=True)
+                "Chrome/Edge 新版加密讀取失敗。可改用 Firefox，或以系統管理員"
+                "重新啟動本工具。詳情：" + msg, err=True)
             if sys.platform.startswith("win") and messagebox.askyesno(
                     "需要系統管理員權限？",
-                    "Chrome/Edge 新版 Cookie 加密可能需要系統管理員權限。\n"
+                    "rookiepy 仍讀不到，可能需系統管理員權限。\n"
                     "要以系統管理員重新啟動本工具嗎？\n"
                     "（或按「否」，改用 Firefox）"):
                 self._restart_as_admin()
