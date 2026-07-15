@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Donder → taiko_filter 匯出",
+  "version": "1.0",
+  "description": "在已登入的 donderhiroba 頁面一鍵匯出通關/全連(FC)/全良為 marks.json，供 taiko_filter 使用。",
+  "content_scripts": [
+    {
+      "matches": ["https://donderhiroba.jp/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": ["https://donderhiroba.jp/*"]
+}
