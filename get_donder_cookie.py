@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 get_donder_cookie.py — 獨立取得 donderhiroba Cookie 的小工具
 ============================================================
@@ -92,8 +90,8 @@ class CookieTool(tk.Tk):
             "1. 先用瀏覽器登入 https://donderhiroba.jp 。\n"
             "2. 選擇該瀏覽器，按「讀取 Cookie」。\n"
             "3. 讀到後會自動複製到剪貼簿；回 taiko_gui 的匯入視窗按 Ctrl+V 貼上。\n\n"
-            "優先使用 rookiepy（支援 Chrome 新版加密，通常免管理員）；\n"
-            "沒有時退回 browser_cookie3。本工具不寫入任何檔案。"
+            "★ Firefox 最簡單（免權限）。\n"
+            "★ Chrome/Edge 新版加密需以【系統管理員】執行本工具才能讀取（讀取失敗時會引導你提權）。"
         )
         tk.Label(self, text=info, bg="#141414", fg="#dddddd", justify="left",
                  font=(UI_FONT, 9), anchor="w").pack(fill="x", **pad)
@@ -205,28 +203,39 @@ class CookieTool(tk.Tk):
         browser = browser or self.browser_var.get()
         needs_special = ("key for cookie" in low or "admin" in low
                          or "decrypt" in low)
-        if needs_special and not _module_available("rookiepy"):
-            if messagebox.askyesno(
-                    "建議安裝 rookiepy",
-                    "Chrome/Edge 新版加密用 browser_cookie3 讀不到。\n"
-                    "rookiepy 通常能處理（且免管理員）。\n"
-                    "要現在自動安裝 rookiepy 並重試嗎？"):
-                self._install_then_read("rookiepy", browser)
-                return
+        if not needs_special:
             self._set_status(f"讀取失敗：{msg}", err=True)
             return
-        if needs_special:
+
+        # Chrome/Edge 新版 App-Bound Encryption：以系統管理員執行時
+        # browser_cookie3 可透過模擬 SYSTEM 取得金鑰解密。
+        if not self._is_admin() and sys.platform.startswith("win"):
             self._set_status(
-                "Chrome/Edge 新版加密讀取失敗。可改用 Firefox，或以系統管理員"
-                "重新啟動本工具。詳情：" + msg, err=True)
-            if sys.platform.startswith("win") and messagebox.askyesno(
-                    "需要系統管理員權限？",
-                    "rookiepy 仍讀不到，可能需系統管理員權限。\n"
+                "Chrome/Edge 新版加密需要系統管理員權限才能解。"
+                "建議以系統管理員重啟本工具後再讀取，或改用 Firefox。", err=True)
+            if messagebox.askyesno(
+                    "以系統管理員重新啟動？",
+                    "Chrome/Edge 新版 Cookie 加密需要系統管理員權限。\n"
                     "要以系統管理員重新啟動本工具嗎？\n"
-                    "（或按「否」，改用 Firefox）"):
+                    "（重啟後再按一次「讀取 Cookie」；或按「否」改用 Firefox）"):
                 self._restart_as_admin()
-        else:
-            self._set_status(f"讀取失敗：{msg}", err=True)
+            return
+
+        # 已是系統管理員仍失敗：多半是 Chrome 開著或套件版本較舊
+        self._set_status(
+            "即使以系統管理員仍讀取失敗。請試：①完全關閉 Chrome/Edge 後重試 "
+            "②執行 pip install -U browser_cookie3 ③改用 Firefox。詳情：" + msg,
+            err=True)
+
+    @staticmethod
+    def _is_admin():
+        if not sys.platform.startswith("win"):
+            return False
+        try:
+            import ctypes
+            return bool(ctypes.windll.shell32.IsUserAnAdmin())
+        except Exception:
+            return False
 
     def _restart_as_admin(self):
         if not sys.platform.startswith("win"):
