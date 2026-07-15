@@ -563,25 +563,15 @@ class TaikoGUI(tk.Tk):
         tk.Label(win, text=info, bg="#141414", fg="#dddddd", justify="left",
                  font=(UI_FONT, 9), anchor="w").pack(fill="x", padx=12, pady=(10, 6))
 
-        # 一鍵讀取（推薦）
+        # 取得 Cookie（獨立小工具）
         auto = tk.Frame(win, bg="#141414"); auto.pack(fill="x", padx=12, pady=(0, 6))
-        tk.Label(auto, text="一鍵讀取（推薦）", bg="#141414", fg="#ffd54a",
-                 font=(UI_FONT, 10, "bold")).pack(side="left")
-        tk.Label(auto, text="瀏覽器", bg="#141414", fg="#bbbbbb").pack(
-            side="left", padx=(10, 4))
-        browser_var = tk.StringVar(value="chrome")
-        ttk.Combobox(auto, textvariable=browser_var, width=8, state="readonly",
-                     values=["chrome", "edge", "firefox", "brave",
-                             "opera"]).pack(side="left")
-        tk.Button(auto, text="🍪 讀取 Cookie",
-                  command=lambda: self._autofill_cookie(
-                      browser_var.get(), cookie_txt, set_status),
-                  bg="#3a5f8a", fg="white", relief="flat", padx=10, pady=2,
-                  cursor="hand2").pack(side="left", padx=8)
-
-        tk.Label(win, text="（Firefox 免權限最順；Chrome/Edge 新版需以系統管理員執行）",
-                 bg="#141414", fg="#999999", font=(UI_FONT, 8),
-                 anchor="w").pack(fill="x", padx=12)
+        tk.Button(auto, text="🍪 開啟「取得 Cookie」工具",
+                  command=self._launch_cookie_tool,
+                  bg="#3a5f8a", fg="white", relief="flat", padx=10, pady=3,
+                  cursor="hand2").pack(side="left")
+        tk.Label(auto, text="讀取後會自動複製，回來按 Ctrl+V 貼到下方即可。",
+                 bg="#141414", fg="#999999", font=(UI_FONT, 8)).pack(
+            side="left", padx=8)
 
         tk.Label(win, text="或手動貼上 Cookie：", bg="#141414", fg="#ffffff",
                  font=(UI_FONT, 10, "bold")).pack(anchor="w", padx=12)
@@ -709,108 +699,20 @@ class TaikoGUI(tk.Tk):
         self._save_marks_silent()
         return applied, scanned
 
-    def _autofill_cookie(self, browser, cookie_txt, set_status):
-        """用 browser_cookie3 直接讀取瀏覽器內 donderhiroba 的 Cookie。"""
-        try:
-            import browser_cookie3  # noqa: F401
-        except ImportError:
-            if not messagebox.askyesno(
-                    "需要安裝套件",
-                    "一鍵讀取需要 browser_cookie3 套件。\n要現在自動安裝嗎？"):
-                return
-            set_status("安裝 browser_cookie3 中…（可能需數十秒）")
-
-            def install():
-                import subprocess
-                try:
-                    subprocess.check_call([sys.executable, "-m", "pip",
-                                           "install", "browser_cookie3"])
-                    self.after(0, lambda: self._read_cookie(
-                        browser, cookie_txt, set_status))
-                except Exception as exc:
-                    self.after(0, lambda e=exc:
-                               set_status(f"安裝失敗：{e}", err=True))
-
-            threading.Thread(target=install, daemon=True).start()
-            return
-        self._read_cookie(browser, cookie_txt, set_status)
-
-    def _read_cookie(self, browser, cookie_txt, set_status):
-        set_status(f"從 {browser} 讀取 donderhiroba Cookie 中…")
-
-        def worker():
-            com_inited = False
-            try:
-                try:
-                    import pythoncom
-                    pythoncom.CoInitialize()
-                    com_inited = True
-                except Exception:
-                    pass
-                import browser_cookie3
-                loader = getattr(browser_cookie3, browser, None)
-                if loader is None:
-                    self.after(0, lambda: set_status(
-                        f"不支援的瀏覽器：{browser}", err=True))
-                    return
-                cj = loader(domain_name="donderhiroba.jp")
-                pairs = [f"{c.name}={c.value}" for c in cj]
-
-                def apply():
-                    if not pairs:
-                        set_status("找不到 donderhiroba 的 Cookie，請先在"
-                                   f"「{browser}」登入該網站。", err=True)
-                        return
-                    cookie_txt.delete("1.0", "end")
-                    cookie_txt.insert("1.0", "; ".join(pairs))
-                    set_status(f"已讀取 {len(pairs)} 個 Cookie，"
-                               "可直接按「開始匯入」。")
-
-                self.after(0, apply)
-            except Exception as exc:
-                msg = str(exc)
-
-                def fail():
-                    if "admin" in msg.lower():
-                        set_status("Chrome/Edge 新版加密需要系統管理員權限；"
-                                   "建議改用 Firefox、以管理員重新啟動，或手動貼上。",
-                                   err=True)
-                        if messagebox.askyesno(
-                                "需要系統管理員權限",
-                                "Chrome/Edge 新版 cookie 加密需要系統管理員權限。\n"
-                                "要以系統管理員重新啟動本程式嗎？\n"
-                                "（或按「否」，改用 Firefox 一鍵讀取或手動貼上）"):
-                            self._restart_as_admin()
-                    else:
-                        set_status(f"讀取失敗：{msg}", err=True)
-
-                self.after(0, fail)
-            finally:
-                if com_inited:
-                    try:
-                        import pythoncom
-                        pythoncom.CoUninitialize()
-                    except Exception:
-                        pass
-
-        threading.Thread(target=worker, daemon=True).start()
-
-    def _restart_as_admin(self):
-        """以系統管理員身分重新啟動本程式（Windows）。"""
-        if not sys.platform.startswith("win"):
-            messagebox.showinfo("不支援", "此功能僅限 Windows。")
+    def _launch_cookie_tool(self):
+        """另開獨立的『取得 Cookie』小工具（get_donder_cookie.py）。"""
+        import subprocess
+        tool = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "get_donder_cookie.py")
+        if not os.path.exists(tool):
+            messagebox.showerror(
+                "找不到工具",
+                "找不到 get_donder_cookie.py（應與本程式放在同一資料夾）。")
             return
         try:
-            import ctypes
-            params = " ".join(f'"{a}"' for a in sys.argv)
-            rc = ctypes.windll.shell32.ShellExecuteW(
-                None, "runas", sys.executable, params, None, 1)
-            if rc > 32:
-                self.destroy()
-            else:
-                messagebox.showerror("無法提權", "使用者已取消或提權失敗。")
+            subprocess.Popen([sys.executable, tool])
         except Exception as exc:
-            messagebox.showerror("無法提權", str(exc))
+            messagebox.showerror("無法啟動", str(exc))
 
     # ------------------------------------------------------------- 播放清單
     def _load_playlists(self):
