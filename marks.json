@@ -3,11 +3,1914 @@
     "status": "perfect"
   },
   "882|oni": {
-    "status": "near",
-    "remaining": 1
+    "status": "perfect"
   },
   "824|oni": {
-    "status": "near",
-    "remaining": 1
+    "status": "perfect"
+  },
+  "1494|oni": {
+    "status": "fc"
+  },
+  "1494|ura": {
+    "status": "fc"
+  },
+  "1217|oni": {
+    "status": "fc"
+  },
+  "47|oni": {
+    "status": "fc"
+  },
+  "1491|oni": {
+    "status": "fc"
+  },
+  "1401|oni": {
+    "status": "fc"
+  },
+  "1460|oni": {
+    "status": "fc"
+  },
+  "1339|oni": {
+    "status": "fc"
+  },
+  "1461|oni": {
+    "status": "fc"
+  },
+  "1233|oni": {
+    "status": "fc"
+  },
+  "1441|oni": {
+    "status": "fc"
+  },
+  "842|oni": {
+    "status": "fc"
+  },
+  "1415|oni": {
+    "status": "fc"
+  },
+  "1408|oni": {
+    "status": "fc"
+  },
+  "1409|oni": {
+    "status": "fc"
+  },
+  "1112|oni": {
+    "status": "fc"
+  },
+  "1178|oni": {
+    "status": "fc"
+  },
+  "1390|oni": {
+    "status": "fc"
+  },
+  "1390|ura": {
+    "status": "fc"
+  },
+  "1344|oni": {
+    "status": "fc"
+  },
+  "1344|ura": {
+    "status": "fc"
+  },
+  "1358|oni": {
+    "status": "fc"
+  },
+  "1362|oni": {
+    "status": "fc"
+  },
+  "1313|oni": {
+    "status": "fc"
+  },
+  "1295|oni": {
+    "status": "perfect"
+  },
+  "1295|ura": {
+    "status": "fc"
+  },
+  "1360|oni": {
+    "status": "perfect"
+  },
+  "1353|oni": {
+    "status": "fc"
+  },
+  "1353|ura": {
+    "status": "fc"
+  },
+  "1241|oni": {
+    "status": "fc"
+  },
+  "1352|oni": {
+    "status": "fc"
+  },
+  "1292|oni": {
+    "status": "fc"
+  },
+  "924|oni": {
+    "status": "fc"
+  },
+  "1341|oni": {
+    "status": "fc"
+  },
+  "1327|ura": {
+    "status": "fc"
+  },
+  "1326|oni": {
+    "status": "fc"
+  },
+  "1312|oni": {
+    "status": "fc"
+  },
+  "1312|ura": {
+    "status": "fc"
+  },
+  "1300|oni": {
+    "status": "fc"
+  },
+  "1293|oni": {
+    "status": "fc"
+  },
+  "1148|ura": {
+    "status": "fc"
+  },
+  "1267|oni": {
+    "status": "perfect"
+  },
+  "1194|oni": {
+    "status": "perfect"
+  },
+  "1268|oni": {
+    "status": "fc"
+  },
+  "1149|oni": {
+    "status": "fc"
+  },
+  "1149|ura": {
+    "status": "fc"
+  },
+  "1240|oni": {
+    "status": "fc"
+  },
+  "1240|ura": {
+    "status": "fc"
+  },
+  "1209|oni": {
+    "status": "fc"
+  },
+  "1251|ura": {
+    "status": "fc"
+  },
+  "1252|oni": {
+    "status": "fc"
+  },
+  "1218|oni": {
+    "status": "fc"
+  },
+  "1218|ura": {
+    "status": "fc"
+  },
+  "1213|oni": {
+    "status": "fc"
+  },
+  "1199|oni": {
+    "status": "fc"
+  },
+  "1116|oni": {
+    "status": "fc"
+  },
+  "1192|oni": {
+    "status": "fc"
+  },
+  "1193|oni": {
+    "status": "fc"
+  },
+  "1150|oni": {
+    "status": "fc"
+  },
+  "1056|oni": {
+    "status": "fc"
+  },
+  "1111|oni": {
+    "status": "fc"
+  },
+  "1191|oni": {
+    "status": "fc"
+  },
+  "937|oni": {
+    "status": "fc"
+  },
+  "1115|oni": {
+    "status": "perfect"
+  },
+  "1059|oni": {
+    "status": "fc"
+  },
+  "1002|oni": {
+    "status": "fc"
+  },
+  "974|oni": {
+    "status": "fc"
+  },
+  "828|oni": {
+    "status": "fc"
+  },
+  "383|oni": {
+    "status": "fc"
+  },
+  "1027|oni": {
+    "status": "fc"
+  },
+  "303|oni": {
+    "status": "fc"
+  },
+  "1090|oni": {
+    "status": "fc"
+  },
+  "1061|oni": {
+    "status": "fc"
+  },
+  "255|oni": {
+    "status": "fc"
+  },
+  "915|oni": {
+    "status": "fc"
+  },
+  "1003|oni": {
+    "status": "fc"
+  },
+  "1004|oni": {
+    "status": "fc"
+  },
+  "861|oni": {
+    "status": "fc"
+  },
+  "824|ura": {
+    "status": "fc"
+  },
+  "1054|oni": {
+    "status": "fc"
+  },
+  "385|oni": {
+    "status": "fc"
+  },
+  "1179|oni": {
+    "status": "fc"
+  },
+  "811|oni": {
+    "status": "perfect"
+  },
+  "1126|oni": {
+    "status": "fc"
+  },
+  "1137|oni": {
+    "status": "fc"
+  },
+  "453|oni": {
+    "status": "fc"
+  },
+  "520|oni": {
+    "status": "fc"
+  },
+  "520|ura": {
+    "status": "fc"
+  },
+  "956|ura": {
+    "status": "fc"
+  },
+  "1169|oni": {
+    "status": "fc"
+  },
+  "1168|oni": {
+    "status": "fc"
+  },
+  "1168|ura": {
+    "status": "fc"
+  },
+  "1162|oni": {
+    "status": "fc"
+  },
+  "1161|oni": {
+    "status": "fc"
+  },
+  "1153|oni": {
+    "status": "perfect"
+  },
+  "1152|oni": {
+    "status": "fc"
+  },
+  "1136|oni": {
+    "status": "fc"
+  },
+  "268|oni": {
+    "status": "fc"
+  },
+  "556|oni": {
+    "status": "fc"
+  },
+  "1020|oni": {
+    "status": "fc"
+  },
+  "1020|ura": {
+    "status": "fc"
+  },
+  "492|oni": {
+    "status": "perfect"
+  },
+  "801|oni": {
+    "status": "fc"
+  },
+  "922|oni": {
+    "status": "fc"
+  },
+  "911|oni": {
+    "status": "fc"
+  },
+  "911|ura": {
+    "status": "fc"
+  },
+  "910|oni": {
+    "status": "fc"
+  },
+  "963|oni": {
+    "status": "fc"
+  },
+  "118|oni": {
+    "status": "fc"
+  },
+  "118|ura": {
+    "status": "fc"
+  },
+  "331|oni": {
+    "status": "fc"
+  },
+  "246|oni": {
+    "status": "perfect"
+  },
+  "491|oni": {
+    "status": "fc"
+  },
+  "1505|oni": {
+    "status": "fc"
+  },
+  "1389|oni": {
+    "status": "fc"
+  },
+  "898|oni": {
+    "status": "fc"
+  },
+  "898|ura": {
+    "status": "fc"
+  },
+  "1316|oni": {
+    "status": "fc"
+  },
+  "1269|oni": {
+    "status": "fc"
+  },
+  "1242|oni": {
+    "status": "fc"
+  },
+  "1388|oni": {
+    "status": "fc"
+  },
+  "1388|ura": {
+    "status": "fc"
+  },
+  "1315|oni": {
+    "status": "fc"
+  },
+  "1334|oni": {
+    "status": "fc"
+  },
+  "1335|oni": {
+    "status": "fc"
+  },
+  "1336|oni": {
+    "status": "fc"
+  },
+  "1314|oni": {
+    "status": "fc"
+  },
+  "666|oni": {
+    "status": "fc"
+  },
+  "1254|oni": {
+    "status": "fc"
+  },
+  "1243|oni": {
+    "status": "perfect"
+  },
+  "1230|oni": {
+    "status": "fc"
+  },
+  "1212|oni": {
+    "status": "perfect"
+  },
+  "1212|ura": {
+    "status": "fc"
+  },
+  "1210|oni": {
+    "status": "fc"
+  },
+  "1117|oni": {
+    "status": "fc"
+  },
+  "256|oni": {
+    "status": "fc"
+  },
+  "1022|oni": {
+    "status": "fc"
+  },
+  "1022|ura": {
+    "status": "fc"
+  },
+  "1180|oni": {
+    "status": "fc"
+  },
+  "1181|oni": {
+    "status": "fc"
+  },
+  "135|oni": {
+    "status": "fc"
+  },
+  "42|oni": {
+    "status": "perfect"
+  },
+  "374|oni": {
+    "status": "fc"
+  },
+  "1062|oni": {
+    "status": "fc"
+  },
+  "430|oni": {
+    "status": "fc"
+  },
+  "368|oni": {
+    "status": "fc"
+  },
+  "333|oni": {
+    "status": "perfect"
+  },
+  "242|oni": {
+    "status": "fc"
+  },
+  "604|oni": {
+    "status": "perfect"
+  },
+  "405|oni": {
+    "status": "fc"
+  },
+  "405|ura": {
+    "status": "fc"
+  },
+  "122|oni": {
+    "status": "fc"
+  },
+  "792|oni": {
+    "status": "fc"
+  },
+  "831|oni": {
+    "status": "perfect"
+  },
+  "247|oni": {
+    "status": "fc"
+  },
+  "226|oni": {
+    "status": "fc"
+  },
+  "478|ura": {
+    "status": "fc"
+  },
+  "484|oni": {
+    "status": "fc"
+  },
+  "203|ura": {
+    "status": "fc"
+  },
+  "483|oni": {
+    "status": "fc"
+  },
+  "202|oni": {
+    "status": "fc"
+  },
+  "153|oni": {
+    "status": "fc"
+  },
+  "671|ura": {
+    "status": "fc"
+  },
+  "200|ura": {
+    "status": "fc"
+  },
+  "511|ura": {
+    "status": "fc"
+  },
+  "676|ura": {
+    "status": "fc"
+  },
+  "646|ura": {
+    "status": "fc"
+  },
+  "1343|ura": {
+    "status": "fc"
+  },
+  "609|oni": {
+    "status": "fc"
+  },
+  "895|oni": {
+    "status": "perfect"
+  },
+  "621|oni": {
+    "status": "fc"
+  },
+  "41|oni": {
+    "status": "fc"
+  },
+  "1511|oni": {
+    "status": "perfect"
+  },
+  "1103|oni": {
+    "status": "fc"
+  },
+  "1463|oni": {
+    "status": "fc"
+  },
+  "1435|oni": {
+    "status": "fc"
+  },
+  "1424|oni": {
+    "status": "fc"
+  },
+  "1425|oni": {
+    "status": "fc"
+  },
+  "1426|oni": {
+    "status": "fc"
+  },
+  "1427|oni": {
+    "status": "fc"
+  },
+  "1428|oni": {
+    "status": "fc"
+  },
+  "1436|oni": {
+    "status": "fc"
+  },
+  "1423|oni": {
+    "status": "fc"
+  },
+  "1402|hard": {
+    "status": "fc"
+  },
+  "1402|oni": {
+    "status": "fc"
+  },
+  "1357|oni": {
+    "status": "fc"
+  },
+  "1357|ura": {
+    "status": "fc"
+  },
+  "283|oni": {
+    "status": "fc"
+  },
+  "473|oni": {
+    "status": "fc"
+  },
+  "472|oni": {
+    "status": "fc"
+  },
+  "1303|oni": {
+    "status": "fc"
+  },
+  "1303|ura": {
+    "status": "fc"
+  },
+  "1228|oni": {
+    "status": "fc"
+  },
+  "1211|oni": {
+    "status": "fc"
+  },
+  "1006|oni": {
+    "status": "fc"
+  },
+  "1139|oni": {
+    "status": "fc"
+  },
+  "1018|oni": {
+    "status": "fc"
+  },
+  "285|oni": {
+    "status": "fc"
+  },
+  "285|ura": {
+    "status": "fc"
+  },
+  "187|oni": {
+    "status": "fc"
+  },
+  "187|ura": {
+    "status": "fc"
+  },
+  "695|easy": {
+    "status": "perfect"
+  },
+  "695|oni": {
+    "status": "fc"
+  },
+  "727|oni": {
+    "status": "fc"
+  },
+  "947|oni": {
+    "status": "fc"
+  },
+  "133|oni": {
+    "status": "fc"
+  },
+  "310|oni": {
+    "status": "fc"
+  },
+  "310|ura": {
+    "status": "fc"
+  },
+  "926|oni": {
+    "status": "fc"
+  },
+  "926|ura": {
+    "status": "fc"
+  },
+  "1234|oni": {
+    "status": "fc"
+  },
+  "1030|oni": {
+    "status": "fc"
+  },
+  "730|oni": {
+    "status": "fc"
+  },
+  "730|ura": {
+    "status": "fc"
+  },
+  "882|ura": {
+    "status": "fc"
+  },
+  "1092|oni": {
+    "status": "fc"
+  },
+  "1077|oni": {
+    "status": "fc"
+  },
+  "1077|ura": {
+    "status": "fc"
+  },
+  "284|oni": {
+    "status": "fc"
+  },
+  "284|ura": {
+    "status": "fc"
+  },
+  "474|oni": {
+    "status": "fc"
+  },
+  "793|ura": {
+    "status": "fc"
+  },
+  "536|oni": {
+    "status": "fc"
+  },
+  "605|oni": {
+    "status": "fc"
+  },
+  "728|oni": {
+    "status": "fc"
+  },
+  "660|oni": {
+    "status": "fc"
+  },
+  "770|oni": {
+    "status": "fc"
+  },
+  "253|oni": {
+    "status": "fc"
+  },
+  "253|ura": {
+    "status": "fc"
+  },
+  "446|oni": {
+    "status": "fc"
+  },
+  "988|oni": {
+    "status": "fc"
+  },
+  "537|oni": {
+    "status": "fc"
+  },
+  "537|ura": {
+    "status": "fc"
+  },
+  "140|oni": {
+    "status": "fc"
+  },
+  "140|ura": {
+    "status": "fc"
+  },
+  "819|oni": {
+    "status": "fc"
+  },
+  "868|oni": {
+    "status": "fc"
+  },
+  "1012|oni": {
+    "status": "fc"
+  },
+  "809|oni": {
+    "status": "fc"
+  },
+  "874|oni": {
+    "status": "fc"
+  },
+  "794|oni": {
+    "status": "fc"
+  },
+  "167|oni": {
+    "status": "fc"
+  },
+  "795|oni": {
+    "status": "fc"
+  },
+  "795|ura": {
+    "status": "fc"
+  },
+  "297|oni": {
+    "status": "fc"
+  },
+  "908|oni": {
+    "status": "fc"
+  },
+  "875|oni": {
+    "status": "fc"
+  },
+  "909|oni": {
+    "status": "fc"
+  },
+  "995|oni": {
+    "status": "fc"
+  },
+  "1107|oni": {
+    "status": "fc"
+  },
+  "808|oni": {
+    "status": "fc"
+  },
+  "975|oni": {
+    "status": "fc"
+  },
+  "771|oni": {
+    "status": "fc"
+  },
+  "771|ura": {
+    "status": "fc"
+  },
+  "1276|oni": {
+    "status": "fc"
+  },
+  "1232|oni": {
+    "status": "fc"
+  },
+  "1184|oni": {
+    "status": "fc"
+  },
+  "349|oni": {
+    "status": "fc"
+  },
+  "351|oni": {
+    "status": "fc"
+  },
+  "59|oni": {
+    "status": "fc"
+  },
+  "576|oni": {
+    "status": "fc"
+  },
+  "559|oni": {
+    "status": "fc"
+  },
+  "823|oni": {
+    "status": "fc"
+  },
+  "574|oni": {
+    "status": "fc"
+  },
+  "570|oni": {
+    "status": "fc"
+  },
+  "17|oni": {
+    "status": "fc"
+  },
+  "220|oni": {
+    "status": "fc"
+  },
+  "168|oni": {
+    "status": "fc"
+  },
+  "171|oni": {
+    "status": "fc"
+  },
+  "134|oni": {
+    "status": "fc"
+  },
+  "166|oni": {
+    "status": "fc"
+  },
+  "169|oni": {
+    "status": "fc"
+  },
+  "881|oni": {
+    "status": "fc"
+  },
+  "880|oni": {
+    "status": "fc"
+  },
+  "1235|oni": {
+    "status": "fc"
+  },
+  "1377|oni": {
+    "status": "fc"
+  },
+  "1378|oni": {
+    "status": "fc"
+  },
+  "1205|oni": {
+    "status": "fc"
+  },
+  "931|oni": {
+    "status": "fc"
+  },
+  "127|oni": {
+    "status": "fc"
+  },
+  "713|oni": {
+    "status": "fc"
+  },
+  "160|ura": {
+    "status": "fc"
+  },
+  "159|oni": {
+    "status": "fc"
+  },
+  "363|oni": {
+    "status": "fc"
+  },
+  "343|oni": {
+    "status": "fc"
+  },
+  "19|oni": {
+    "status": "fc"
+  },
+  "20|easy": {
+    "status": "perfect"
+  },
+  "20|oni": {
+    "status": "fc"
+  },
+  "340|oni": {
+    "status": "fc"
+  },
+  "103|oni": {
+    "status": "fc"
+  },
+  "504|ura": {
+    "status": "fc"
+  },
+  "507|oni": {
+    "status": "fc"
+  },
+  "797|oni": {
+    "status": "fc"
+  },
+  "55|oni": {
+    "status": "fc"
+  },
+  "596|oni": {
+    "status": "fc"
+  },
+  "864|oni": {
+    "status": "fc"
+  },
+  "1329|oni": {
+    "status": "fc"
+  },
+  "1431|oni": {
+    "status": "fc"
+  },
+  "350|oni": {
+    "status": "fc"
+  },
+  "935|oni": {
+    "status": "fc"
+  },
+  "932|oni": {
+    "status": "fc"
+  },
+  "933|oni": {
+    "status": "fc"
+  },
+  "610|oni": {
+    "status": "fc"
+  },
+  "218|oni": {
+    "status": "fc"
+  },
+  "138|oni": {
+    "status": "fc"
+  },
+  "647|oni": {
+    "status": "fc"
+  },
+  "154|oni": {
+    "status": "fc"
+  },
+  "1380|ura": {
+    "status": "fc"
+  },
+  "1379|oni": {
+    "status": "fc"
+  },
+  "1080|oni": {
+    "status": "fc"
+  },
+  "164|oni": {
+    "status": "fc"
+  },
+  "358|oni": {
+    "status": "fc"
+  },
+  "359|oni": {
+    "status": "fc"
+  },
+  "114|oni": {
+    "status": "fc"
+  },
+  "517|oni": {
+    "status": "fc"
+  },
+  "523|oni": {
+    "status": "fc"
+  },
+  "524|oni": {
+    "status": "fc"
+  },
+  "857|oni": {
+    "status": "fc"
+  },
+  "759|oni": {
+    "status": "fc"
+  },
+  "1015|oni": {
+    "status": "fc"
+  },
+  "1206|oni": {
+    "status": "fc"
+  },
+  "1207|oni": {
+    "status": "fc"
+  },
+  "1311|oni": {
+    "status": "fc"
+  },
+  "1310|oni": {
+    "status": "fc"
+  },
+  "1418|oni": {
+    "status": "fc"
+  },
+  "1510|oni": {
+    "status": "fc"
+  },
+  "1433|oni": {
+    "status": "fc"
+  },
+  "1414|ura": {
+    "status": "fc"
+  },
+  "1452|oni": {
+    "status": "fc"
+  },
+  "1448|oni": {
+    "status": "perfect"
+  },
+  "1421|oni": {
+    "status": "fc"
+  },
+  "1420|oni": {
+    "status": "fc"
+  },
+  "1413|oni": {
+    "status": "fc"
+  },
+  "1381|oni": {
+    "status": "fc"
+  },
+  "1382|ura": {
+    "status": "fc"
+  },
+  "1403|oni": {
+    "status": "fc"
+  },
+  "1393|oni": {
+    "status": "fc"
+  },
+  "1392|oni": {
+    "status": "fc"
+  },
+  "1391|oni": {
+    "status": "fc"
+  },
+  "1371|oni": {
+    "status": "fc"
+  },
+  "1370|oni": {
+    "status": "fc"
+  },
+  "1368|oni": {
+    "status": "fc"
+  },
+  "1364|oni": {
+    "status": "fc"
+  },
+  "1365|oni": {
+    "status": "fc"
+  },
+  "1356|oni": {
+    "status": "fc"
+  },
+  "1355|oni": {
+    "status": "fc"
+  },
+  "1354|oni": {
+    "status": "fc"
+  },
+  "1349|oni": {
+    "status": "fc"
+  },
+  "1348|oni": {
+    "status": "fc"
+  },
+  "1337|oni": {
+    "status": "perfect"
+  },
+  "1325|oni": {
+    "status": "fc"
+  },
+  "1320|oni": {
+    "status": "fc"
+  },
+  "1319|oni": {
+    "status": "fc"
+  },
+  "1318|oni": {
+    "status": "fc"
+  },
+  "1304|ura": {
+    "status": "fc"
+  },
+  "1277|oni": {
+    "status": "fc"
+  },
+  "1308|oni": {
+    "status": "fc"
+  },
+  "1306|oni": {
+    "status": "fc"
+  },
+  "1305|oni": {
+    "status": "fc"
+  },
+  "1307|oni": {
+    "status": "fc"
+  },
+  "1263|oni": {
+    "status": "fc"
+  },
+  "1257|oni": {
+    "status": "fc"
+  },
+  "1264|oni": {
+    "status": "fc"
+  },
+  "1265|ura": {
+    "status": "fc"
+  },
+  "1260|oni": {
+    "status": "fc"
+  },
+  "1258|oni": {
+    "status": "fc"
+  },
+  "1266|oni": {
+    "status": "fc"
+  },
+  "1261|oni": {
+    "status": "fc"
+  },
+  "1262|oni": {
+    "status": "fc"
+  },
+  "1259|oni": {
+    "status": "fc"
+  },
+  "1279|oni": {
+    "status": "fc"
+  },
+  "1275|oni": {
+    "status": "fc"
+  },
+  "1274|ura": {
+    "status": "fc"
+  },
+  "1273|oni": {
+    "status": "fc"
+  },
+  "1249|oni": {
+    "status": "fc"
+  },
+  "1246|oni": {
+    "status": "fc"
+  },
+  "1245|oni": {
+    "status": "fc"
+  },
+  "1237|oni": {
+    "status": "fc"
+  },
+  "1231|oni": {
+    "status": "fc"
+  },
+  "1226|ura": {
+    "status": "fc"
+  },
+  "1225|ura": {
+    "status": "fc"
+  },
+  "1215|oni": {
+    "status": "fc"
+  },
+  "1203|oni": {
+    "status": "fc"
+  },
+  "1202|oni": {
+    "status": "fc"
+  },
+  "1201|oni": {
+    "status": "fc"
+  },
+  "1183|oni": {
+    "status": "fc"
+  },
+  "1170|oni": {
+    "status": "fc"
+  },
+  "1158|oni": {
+    "status": "fc"
+  },
+  "1160|oni": {
+    "status": "fc"
+  },
+  "1157|ura": {
+    "status": "fc"
+  },
+  "1154|oni": {
+    "status": "fc"
+  },
+  "1145|oni": {
+    "status": "fc"
+  },
+  "1133|oni": {
+    "status": "fc"
+  },
+  "1130|oni": {
+    "status": "fc"
+  },
+  "1131|ura": {
+    "status": "fc"
+  },
+  "1122|oni": {
+    "status": "fc"
+  },
+  "1109|oni": {
+    "status": "fc"
+  },
+  "1096|oni": {
+    "status": "fc"
+  },
+  "1082|ura": {
+    "status": "fc"
+  },
+  "1083|oni": {
+    "status": "fc"
+  },
+  "1084|ura": {
+    "status": "fc"
+  },
+  "1079|oni": {
+    "status": "fc"
+  },
+  "1069|oni": {
+    "status": "fc"
+  },
+  "1067|oni": {
+    "status": "fc"
+  },
+  "1067|ura": {
+    "status": "fc"
+  },
+  "1068|oni": {
+    "status": "fc"
+  },
+  "1052|oni": {
+    "status": "fc"
+  },
+  "1047|oni": {
+    "status": "fc"
+  },
+  "1058|ura": {
+    "status": "fc"
+  },
+  "1045|oni": {
+    "status": "fc"
+  },
+  "1043|oni": {
+    "status": "fc"
+  },
+  "1033|ura": {
+    "status": "fc"
+  },
+  "1032|ura": {
+    "status": "fc"
+  },
+  "1021|oni": {
+    "status": "fc"
+  },
+  "1013|oni": {
+    "status": "fc"
+  },
+  "1000|oni": {
+    "status": "fc"
+  },
+  "994|oni": {
+    "status": "fc"
+  },
+  "981|oni": {
+    "status": "fc"
+  },
+  "980|oni": {
+    "status": "fc"
+  },
+  "979|oni": {
+    "status": "fc"
+  },
+  "977|oni": {
+    "status": "fc"
+  },
+  "976|oni": {
+    "status": "fc"
+  },
+  "972|oni": {
+    "status": "fc"
+  },
+  "959|oni": {
+    "status": "fc"
+  },
+  "958|oni": {
+    "status": "fc"
+  },
+  "939|oni": {
+    "status": "fc"
+  },
+  "938|oni": {
+    "status": "fc"
+  },
+  "938|ura": {
+    "status": "fc"
+  },
+  "944|oni": {
+    "status": "fc"
+  },
+  "907|oni": {
+    "status": "fc"
+  },
+  "67|oni": {
+    "status": "fc"
+  },
+  "433|oni": {
+    "status": "fc"
+  },
+  "433|ura": {
+    "status": "fc"
+  },
+  "701|oni": {
+    "status": "fc"
+  },
+  "66|oni": {
+    "status": "fc"
+  },
+  "816|oni": {
+    "status": "fc"
+  },
+  "852|oni": {
+    "status": "fc"
+  },
+  "800|oni": {
+    "status": "fc"
+  },
+  "846|oni": {
+    "status": "fc"
+  },
+  "784|oni": {
+    "status": "fc"
+  },
+  "776|oni": {
+    "status": "fc"
+  },
+  "776|ura": {
+    "status": "fc"
+  },
+  "867|oni": {
+    "status": "fc"
+  },
+  "750|oni": {
+    "status": "fc"
+  },
+  "751|oni": {
+    "status": "fc"
+  },
+  "746|oni": {
+    "status": "fc"
+  },
+  "749|oni": {
+    "status": "fc"
+  },
+  "724|oni": {
+    "status": "fc"
+  },
+  "715|oni": {
+    "status": "fc"
+  },
+  "714|oni": {
+    "status": "fc"
+  },
+  "448|ura": {
+    "status": "fc"
+  },
+  "588|oni": {
+    "status": "fc"
+  },
+  "15|ura": {
+    "status": "fc"
+  },
+  "641|oni": {
+    "status": "fc"
+  },
+  "615|oni": {
+    "status": "fc"
+  },
+  "614|oni": {
+    "status": "fc"
+  },
+  "612|oni": {
+    "status": "fc"
+  },
+  "527|oni": {
+    "status": "fc"
+  },
+  "549|oni": {
+    "status": "fc"
+  },
+  "550|oni": {
+    "status": "fc"
+  },
+  "558|oni": {
+    "status": "fc"
+  },
+  "526|oni": {
+    "status": "fc"
+  },
+  "561|oni": {
+    "status": "fc"
+  },
+  "566|oni": {
+    "status": "fc"
+  },
+  "591|oni": {
+    "status": "fc"
+  },
+  "592|oni": {
+    "status": "fc"
+  },
+  "260|oni": {
+    "status": "fc"
+  },
+  "96|oni": {
+    "status": "fc"
+  },
+  "16|oni": {
+    "status": "fc"
+  },
+  "399|oni": {
+    "status": "fc"
+  },
+  "108|oni": {
+    "status": "fc"
+  },
+  "183|oni": {
+    "status": "fc"
+  },
+  "651|oni": {
+    "status": "fc"
+  },
+  "488|oni": {
+    "status": "fc"
+  },
+  "496|oni": {
+    "status": "fc"
+  },
+  "128|oni": {
+    "status": "fc"
+  },
+  "211|oni": {
+    "status": "fc"
+  },
+  "406|oni": {
+    "status": "fc"
+  },
+  "12|oni": {
+    "status": "fc"
+  },
+  "53|oni": {
+    "status": "fc"
+  },
+  "322|oni": {
+    "status": "fc"
+  },
+  "323|oni": {
+    "status": "fc"
+  },
+  "117|oni": {
+    "status": "fc"
+  },
+  "377|oni": {
+    "status": "fc"
+  },
+  "191|oni": {
+    "status": "fc"
+  },
+  "395|oni": {
+    "status": "fc"
+  },
+  "500|ura": {
+    "status": "fc"
+  },
+  "180|oni": {
+    "status": "fc"
+  },
+  "567|oni": {
+    "status": "fc"
+  },
+  "470|ura": {
+    "status": "fc"
+  },
+  "471|oni": {
+    "status": "fc"
+  },
+  "501|oni": {
+    "status": "fc"
+  },
+  "45|oni": {
+    "status": "fc"
+  },
+  "45|ura": {
+    "status": "fc"
+  },
+  "513|oni": {
+    "status": "fc"
+  },
+  "580|ura": {
+    "status": "fc"
+  },
+  "100|ura": {
+    "status": "fc"
+  },
+  "111|oni": {
+    "status": "fc"
+  },
+  "738|oni": {
+    "status": "fc"
+  },
+  "88|oni": {
+    "status": "fc"
+  },
+  "90|oni": {
+    "status": "fc"
+  },
+  "163|oni": {
+    "status": "fc"
+  },
+  "163|ura": {
+    "status": "fc"
+  },
+  "437|oni": {
+    "status": "fc"
+  },
+  "109|ura": {
+    "status": "fc"
+  },
+  "80|oni": {
+    "status": "fc"
+  },
+  "270|oni": {
+    "status": "fc"
+  },
+  "270|ura": {
+    "status": "fc"
+  },
+  "425|oni": {
+    "status": "fc"
+  },
+  "425|ura": {
+    "status": "fc"
+  },
+  "248|ura": {
+    "status": "fc"
+  },
+  "618|oni": {
+    "status": "fc"
+  },
+  "95|oni": {
+    "status": "fc"
+  },
+  "64|oni": {
+    "status": "fc"
+  },
+  "579|oni": {
+    "status": "fc"
+  },
+  "579|ura": {
+    "status": "fc"
+  },
+  "554|oni": {
+    "status": "fc"
+  },
+  "653|oni": {
+    "status": "fc"
+  },
+  "173|oni": {
+    "status": "fc"
+  },
+  "60|oni": {
+    "status": "fc"
+  },
+  "60|ura": {
+    "status": "fc"
+  },
+  "72|oni": {
+    "status": "fc"
+  },
+  "21|oni": {
+    "status": "fc"
+  },
+  "747|oni": {
+    "status": "fc"
+  },
+  "38|oni": {
+    "status": "fc"
+  },
+  "432|oni": {
+    "status": "fc"
+  },
+  "742|oni": {
+    "status": "fc"
+  },
+  "397|oni": {
+    "status": "fc"
+  },
+  "31|oni": {
+    "status": "fc"
+  },
+  "311|oni": {
+    "status": "fc"
+  },
+  "391|oni": {
+    "status": "fc"
+  },
+  "719|oni": {
+    "status": "fc"
+  },
+  "273|hard": {
+    "status": "fc"
+  },
+  "273|oni": {
+    "status": "fc"
+  },
+  "273|ura": {
+    "status": "fc"
+  },
+  "274|oni": {
+    "status": "fc"
+  },
+  "274|ura": {
+    "status": "fc"
+  },
+  "276|oni": {
+    "status": "fc"
+  },
+  "276|ura": {
+    "status": "fc"
+  },
+  "277|oni": {
+    "status": "fc"
+  },
+  "277|ura": {
+    "status": "fc"
+  },
+  "278|ura": {
+    "status": "fc"
+  },
+  "652|oni": {
+    "status": "fc"
+  },
+  "652|ura": {
+    "status": "fc"
+  },
+  "551|oni": {
+    "status": "fc"
+  },
+  "348|ura": {
+    "status": "fc"
+  },
+  "371|oni": {
+    "status": "fc"
+  },
+  "371|ura": {
+    "status": "fc"
+  },
+  "372|oni": {
+    "status": "fc"
+  },
+  "410|oni": {
+    "status": "fc"
+  },
+  "73|oni": {
+    "status": "fc"
+  },
+  "447|oni": {
+    "status": "fc"
+  },
+  "346|oni": {
+    "status": "fc"
+  },
+  "56|oni": {
+    "status": "fc"
+  },
+  "451|oni": {
+    "status": "fc"
+  },
+  "635|oni": {
+    "status": "fc"
+  },
+  "779|oni": {
+    "status": "fc"
+  },
+  "519|oni": {
+    "status": "fc"
+  },
+  "866|oni": {
+    "status": "fc"
+  },
+  "684|oni": {
+    "status": "fc"
+  },
+  "572|oni": {
+    "status": "fc"
+  },
+  "22|oni": {
+    "status": "fc"
+  },
+  "152|oni": {
+    "status": "fc"
+  },
+  "571|oni": {
+    "status": "fc"
+  },
+  "375|oni": {
+    "status": "fc"
+  },
+  "649|oni": {
+    "status": "fc"
+  },
+  "716|oni": {
+    "status": "fc"
+  },
+  "5|oni": {
+    "status": "fc"
+  },
+  "568|oni": {
+    "status": "fc"
+  },
+  "454|oni": {
+    "status": "fc"
+  },
+  "514|oni": {
+    "status": "fc"
+  },
+  "569|oni": {
+    "status": "fc"
+  },
+  "431|oni": {
+    "status": "fc"
+  },
+  "775|oni": {
+    "status": "fc"
+  },
+  "775|ura": {
+    "status": "fc"
+  },
+  "686|oni": {
+    "status": "fc"
+  },
+  "288|oni": {
+    "status": "fc"
+  },
+  "194|oni": {
+    "status": "fc"
+  },
+  "629|oni": {
+    "status": "fc"
+  },
+  "879|oni": {
+    "status": "fc"
+  },
+  "356|oni": {
+    "status": "fc"
+  },
+  "386|oni": {
+    "status": "fc"
+  },
+  "404|oni": {
+    "status": "fc"
+  },
+  "252|oni": {
+    "status": "fc"
+  },
+  "131|oni": {
+    "status": "fc"
+  },
+  "452|oni": {
+    "status": "fc"
+  },
+  "1437|oni": {
+    "status": "fc"
+  },
+  "1363|oni": {
+    "status": "fc"
+  },
+  "1198|oni": {
+    "status": "fc"
+  },
+  "1176|oni": {
+    "status": "fc"
+  },
+  "1175|oni": {
+    "status": "fc"
+  },
+  "967|oni": {
+    "status": "fc"
+  },
+  "968|oni": {
+    "status": "fc"
+  },
+  "969|oni": {
+    "status": "fc"
+  },
+  "970|oni": {
+    "status": "fc"
+  },
+  "951|ura": {
+    "status": "fc"
+  },
+  "803|oni": {
+    "status": "fc"
+  },
+  "1037|oni": {
+    "status": "fc"
+  },
+  "929|oni": {
+    "status": "fc"
+  },
+  "930|oni": {
+    "status": "fc"
+  },
+  "844|oni": {
+    "status": "fc"
+  },
+  "804|oni": {
+    "status": "fc"
+  },
+  "804|ura": {
+    "status": "fc"
+  },
+  "805|oni": {
+    "status": "fc"
+  },
+  "637|oni": {
+    "status": "fc"
+  },
+  "487|ura": {
+    "status": "fc"
+  },
+  "607|oni": {
+    "status": "fc"
+  },
+  "734|oni": {
+    "status": "fc"
+  },
+  "456|oni": {
+    "status": "fc"
+  },
+  "856|oni": {
+    "status": "fc"
+  },
+  "539|oni": {
+    "status": "fc"
+  },
+  "418|oni": {
+    "status": "fc"
+  },
+  "419|oni": {
+    "status": "fc"
+  },
+  "639|oni": {
+    "status": "fc"
+  },
+  "540|oni": {
+    "status": "fc"
+  },
+  "1034|oni": {
+    "status": "fc"
+  },
+  "421|oni": {
+    "status": "fc"
+  },
+  "417|ura": {
+    "status": "fc"
+  },
+  "420|oni": {
+    "status": "fc"
+  },
+  "754|oni": {
+    "status": "fc"
+  },
+  "411|oni": {
+    "status": "fc"
+  },
+  "413|oni": {
+    "status": "fc"
+  },
+  "948|oni": {
+    "status": "fc"
+  },
+  "755|oni": {
+    "status": "fc"
+  },
+  "680|oni": {
+    "status": "fc"
+  },
+  "681|oni": {
+    "status": "fc"
+  },
+  "414|oni": {
+    "status": "fc"
+  },
+  "414|ura": {
+    "status": "fc"
+  },
+  "1140|ura": {
+    "status": "fc"
+  },
+  "1057|oni": {
+    "status": "fc"
+  },
+  "1035|ura": {
+    "status": "fc"
+  },
+  "416|oni": {
+    "status": "fc"
+  },
+  "412|oni": {
+    "status": "fc"
+  },
+  "89|oni": {
+    "status": "fc"
+  },
+  "85|oni": {
+    "status": "fc"
   }
 }
