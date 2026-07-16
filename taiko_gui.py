@@ -290,6 +290,10 @@ class TaikoGUI(tk.Tk):
         tk.Button(mrow, text="💾 儲存標記", command=self._save_marks,
                   bg="#2e8b57", fg="white", font=(UI_FONT, 10, "bold"),
                   relief="flat", padx=12, pady=3, cursor="hand2").pack(side="left")
+        tk.Button(mrow, text="📥 載入 marks.json（合併）",
+                  command=self._load_marks_file,
+                  bg="#3a5f8a", fg="white", relief="flat", padx=12, pady=3,
+                  cursor="hand2").pack(side="left", padx=(12, 0))
 
         # 結果表格
         tframe = tk.Frame(self, bg="#141414"); tframe.pack(fill="both", expand=True,
@@ -530,6 +534,55 @@ class TaikoGUI(tk.Tk):
                              "（推送後線上即可查看）。")
         except OSError as exc:
             messagebox.showerror("儲存失敗", str(exc))
+
+    def _load_marks_file(self):
+        """載入外部 marks.json（例如擴充匯出的）並合併。
+        依成就高低合併（none<fc<near<perfect），不降級現有標記，
+        因此手動的「快全良」不會被匯入的 FC 覆蓋。"""
+        path = filedialog.askopenfilename(
+            title="選擇要合併的 marks.json（例如擴充匯出的檔案）",
+            filetypes=[("JSON", "*.json"), ("所有檔案", "*.*")])
+        if not path:
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                incoming = json.load(f)
+        except (OSError, ValueError) as exc:
+            messagebox.showerror("讀取失敗", str(exc))
+            return
+        if not isinstance(incoming, dict):
+            messagebox.showerror("格式錯誤", "檔案內容不是有效的標記物件。")
+            return
+
+        order = {"none": 0, "fc": 1, "near": 2, "perfect": 3}
+        added = upgraded = kept = 0
+        for key, val in incoming.items():
+            if not isinstance(val, dict):
+                continue
+            new_status = val.get("status")
+            if new_status not in order or new_status == "none":
+                continue
+            cur = self.marks.get(key)
+            cur_status = cur.get("status") if isinstance(cur, dict) else None
+            if cur_status is None:
+                self.marks[key] = dict(val)
+                added += 1
+            elif order.get(new_status, 0) > order.get(cur_status, 0):
+                self.marks[key] = dict(val)
+                upgraded += 1
+            else:
+                kept += 1  # 現有標記相等或更高，保留
+
+        try:
+            with open(MARKS_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.marks, f, ensure_ascii=False, indent=2)
+        except OSError as exc:
+            messagebox.showerror("儲存失敗", str(exc))
+            return
+        if self.rows:
+            self._populate()
+        self._set_status(f"已合併：新增 {added}、升級 {upgraded}、保留 {kept}；"
+                         f"目前共 {len(self.marks)} 筆（已存 marks.json）。")
 
     # ------------------------------------------------------------- 播放清單
     def _load_playlists(self):
