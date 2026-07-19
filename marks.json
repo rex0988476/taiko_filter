@@ -488,6 +488,9 @@
   "202|oni": {
     "status": "fc"
   },
+  "202|ura": {
+    "status": "fc"
+  },
   "153|oni": {
     "status": "fc"
   },
@@ -719,8 +722,14 @@
   "819|easy": {
     "status": "perfect"
   },
+  "819|normal": {
+    "status": "perfect"
+  },
   "819|oni": {
     "status": "fc"
+  },
+  "868|easy": {
+    "status": "perfect"
   },
   "868|oni": {
     "status": "fc"
@@ -852,6 +861,9 @@
     "status": "fc"
   },
   "127|oni": {
+    "status": "fc"
+  },
+  "156|ura": {
     "status": "fc"
   },
   "713|oni": {
@@ -993,6 +1005,9 @@
     "status": "fc"
   },
   "1418|oni": {
+    "status": "fc"
+  },
+  "1502|oni": {
     "status": "fc"
   },
   "1510|oni": {
@@ -1793,6 +1808,9 @@
   "252|oni": {
     "status": "fc"
   },
+  "1|oni": {
+    "status": "fc"
+  },
   "131|oni": {
     "status": "fc"
   },
@@ -1941,6 +1959,9 @@
     "status": "fc"
   },
   "416|oni": {
+    "status": "fc"
+  },
+  "538|oni": {
     "status": "fc"
   },
   "412|oni": {

@@ -1,14 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "Donder → taiko_filter 匯出",
-  "version": "1.0",
-  "description": "在已登入的 donderhiroba 頁面一鍵匯出通關/全連(FC)/全良為 marks.json，供 taiko_filter 使用。",
+  "name": "Donder → taiko_filter 匯出 + 統計 + 難度表",
+  "version": "1.3",
+  "description": "在已登入的 donderhiroba 頁面一鍵匯出成績、統計鬼/裏數量,並對照 taiko.wiki 星等產生鬼/裏難度表。",
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["https://donderhiroba.jp/*"],
-      "js": ["content.js"],
+      "js": ["content.js", "count.js", "stars.js"],
       "run_at": "document_idle"
     }
   ],
-  "host_permissions": ["https://donderhiroba.jp/*"]
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://donderhiroba.jp/*",
+    "https://taiko.wiki/*"
+  ]
 }
