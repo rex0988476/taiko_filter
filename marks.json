@@ -1,13 +1,4 @@
 {
-  "793|oni": {
-    "status": "perfect"
-  },
-  "882|oni": {
-    "status": "perfect"
-  },
-  "824|oni": {
-    "status": "perfect"
-  },
   "1494|oni": {
     "status": "fc"
   },
@@ -140,6 +131,9 @@
   "1268|oni": {
     "status": "fc"
   },
+  "1268|ura": {
+    "status": "fc"
+  },
   "1149|oni": {
     "status": "fc"
   },
@@ -201,10 +195,10 @@
     "status": "perfect"
   },
   "1059|oni": {
-    "status": "fc"
+    "status": "perfect"
   },
   "1002|oni": {
-    "status": "fc"
+    "status": "perfect"
   },
   "974|oni": {
     "status": "fc"
@@ -241,6 +235,9 @@
   },
   "861|oni": {
     "status": "fc"
+  },
+  "824|oni": {
+    "status": "perfect"
   },
   "824|ura": {
     "status": "fc"
@@ -650,6 +647,9 @@
   "730|ura": {
     "status": "fc"
   },
+  "882|oni": {
+    "status": "perfect"
+  },
   "882|ura": {
     "status": "fc"
   },
@@ -670,6 +670,9 @@
   },
   "474|oni": {
     "status": "fc"
+  },
+  "793|oni": {
+    "status": "perfect"
   },
   "793|ura": {
     "status": "fc"
@@ -712,6 +715,9 @@
   },
   "140|ura": {
     "status": "fc"
+  },
+  "819|easy": {
+    "status": "perfect"
   },
   "819|oni": {
     "status": "fc"
@@ -861,6 +867,12 @@
     "status": "fc"
   },
   "343|oni": {
+    "status": "fc"
+  },
+  "361|oni": {
+    "status": "fc"
+  },
+  "361|ura": {
     "status": "fc"
   },
   "19|oni": {
@@ -1017,6 +1029,9 @@
     "status": "fc"
   },
   "1393|oni": {
+    "status": "fc"
+  },
+  "1393|ura": {
     "status": "fc"
   },
   "1392|oni": {
@@ -1214,6 +1229,9 @@
   "1079|oni": {
     "status": "fc"
   },
+  "1050|oni": {
+    "status": "fc"
+  },
   "1069|oni": {
     "status": "fc"
   },
@@ -1358,6 +1376,9 @@
   "714|oni": {
     "status": "fc"
   },
+  "181|oni": {
+    "status": "fc"
+  },
   "448|ura": {
     "status": "fc"
   },
@@ -1365,6 +1386,9 @@
     "status": "fc"
   },
   "15|ura": {
+    "status": "fc"
+  },
+  "673|oni": {
     "status": "fc"
   },
   "641|oni": {
@@ -1415,7 +1439,13 @@
   "16|oni": {
     "status": "fc"
   },
+  "400|ura": {
+    "status": "fc"
+  },
   "399|oni": {
+    "status": "fc"
+  },
+  "399|ura": {
     "status": "fc"
   },
   "108|oni": {
@@ -1700,6 +1730,9 @@
   "571|oni": {
     "status": "fc"
   },
+  "720|oni": {
+    "status": "fc"
+  },
   "375|oni": {
     "status": "fc"
   },
@@ -1800,6 +1833,12 @@
     "status": "fc"
   },
   "1037|oni": {
+    "status": "fc"
+  },
+  "927|easy": {
+    "status": "perfect"
+  },
+  "927|oni": {
     "status": "fc"
   },
   "929|oni": {
